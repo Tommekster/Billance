@@ -31,9 +31,13 @@ public class Billance extends javax.swing.JFrame {
             tarifCmb.setModel(new DefaultComboBoxModel<>(dateList2Strings(Tariff.getTarrifs())));
             tarifCmb.setSelectedIndex(-1);
             // load list of contracts
-            
+            contractCmb.setModel(new DefaultComboBoxModel<>(Contract.getContracts()));
+            contractCmb.setSelectedIndex(-1);
+            // load list of contracts
+            flatCmb.setModel(new DefaultComboBoxModel<>(Flat.getFlats()));
+            flatCmb.setSelectedIndex(-1);
         }catch(Exception e){
-            JOptionPane.showMessageDialog(this, "Unexpected exception", "Title", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Unexpected exception\n"+e.getMessage(), "Title", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -74,8 +78,6 @@ public class Billance extends javax.swing.JFrame {
         jLabel2.setText("Contract");
 
         jLabel3.setText("Flat");
-
-        flatCmb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4" }));
 
         jLabel4.setText("Document number");
 

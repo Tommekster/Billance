@@ -177,4 +177,36 @@ public class Database {
         }
         return tarrifs.toArray(new Date [0]);
     }
+    
+    public String [] getContracts() throws ClassNotFoundException, SQLException{
+        if(con == null) getConnection();
+        Statement state = con.createStatement();
+        ResultSet rs = state.executeQuery("SELECT code FROM contracts ORDER BY 'from'");
+        List<String> contracts = new LinkedList<>();
+        while(rs.next()) {
+            contracts.add(rs.getString("code"));
+        }
+        return contracts.toArray(new String [0]);
+    }
+    
+    /*public Integer [] getFlats() throws ClassNotFoundException, SQLException{
+        if(con == null) getConnection();
+        Statement state = con.createStatement();
+        ResultSet rs = state.executeQuery("SELECT rowid FROM flats ORDER BY rowid");
+        List<Integer> flats = new LinkedList<>();
+        while(rs.next()) {
+            flats.add(rs.getInt("rowid"));
+        }
+        return flats.toArray(new Integer [0]);
+    }*/
+    public String [] getFlats() throws ClassNotFoundException, SQLException{
+        if(con == null) getConnection();
+        Statement state = con.createStatement();
+        ResultSet rs = state.executeQuery("SELECT rowid FROM flats ORDER BY rowid");
+        List<String> flats = new LinkedList<>();
+        while(rs.next()) {
+            flats.add(rs.getString("rowid"));
+        }
+        return flats.toArray(new String [0]);
+    }
 }
