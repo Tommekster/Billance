@@ -5,16 +5,57 @@
  */
 package billance;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import java.lang.reflect.*;
 
 /**
  *
  * @author Acer
  */
 public class Tariff {
+    private Date validFrom;
+    public float water;
+    public float heat;
+    public float fee;
+    public float elvt;
+    public float elnt;
+    public float elfee;
+    public float volumeCoef;
+    public float combustionHeat;
+    public float surfaceCoef;
+    
     public static Date [] getTarrifs() throws ClassNotFoundException, SQLException, ParseException{
         return Database.getInstance().getTarrifs();
+    }
+    
+    private Tariff(){}
+
+    static Tariff findTariff(Date validFrom) {
+        try {
+            ResultSet rs = Database.getInstance().findTariff(validFrom);
+            Tariff t = new Tariff();
+            t.validFrom = validFrom;
+            Field [] fields = Tariff.class.getFields();
+            for(Field field : fields){
+                rs.getFloat(field.getName());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Tariff.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    double getVolumeCoeficient() {
+        return volumeCoef;
+    }
+
+    double getCombustionHeat() {
+        return combustionHeat;
     }
 }
