@@ -5,8 +5,11 @@
  */
 package billance;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 /**
  *
@@ -206,7 +210,17 @@ public class Billance extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
-        
+        try {
+            // check values
+            Date from = getDateValue(beginDate);
+            Date to = getDateValue(endDate);
+            Flat flat = Flat.findFlat(Integer.parseInt((String) flatCmb.getSelectedItem()));
+            Tariff tariff = Tariff.findTariff(dateFormat.parse((String) tarifCmb.getSelectedItem()));
+            
+            EnergyBillance billance = EnergyBillance.loadMeasures(from, to, flat, tariff);
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(this, "Some fields has incorrect values. ", "Incorrect fields", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_continueButtonActionPerformed
 
     /**
@@ -250,7 +264,26 @@ public class Billance extends javax.swing.JFrame {
             strings[i] = dateFormat.format(dl[i]);
         return strings;
     }
+
+    private Date getDateValue(JTextField textField) throws ParseException {
+        try {
+            Date date = dateFormat.parse(textField.getText());
+            correctComponent(textField);
+            return date;
+        } catch (ParseException ex) {
+            incorrectComponent(textField);
+            throw ex;
+        }
+    }
     
+    private void correctComponent(Component component) {
+        component.setBackground(Color.white);
+    }
+
+    private void incorrectComponent(Component component) {
+        component.setBackground(Color.pink);
+    }
+
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField beginDate;
@@ -274,4 +307,6 @@ public class Billance extends javax.swing.JFrame {
     private javax.swing.JTextField personText;
     private javax.swing.JComboBox<String> tarifCmb;
     // End of variables declaration//GEN-END:variables
+
+    
 }
