@@ -152,7 +152,7 @@ public class Database {
         if(!res.next()){
             // build the table
             Statement state2 = con.createStatement();
-            state2.execute("CREATE VIEW IF NOT EXISTS 'heatConsumption' AS SELECT p.date AS 'from', c.date AS 'to', (c.gas-p.gas) AS gas, (c.wm0-p.wm0) AS wm0, (c.wm1-p.wm1) AS wm1, (c.wm2-p.wm2) AS wm2, (c.wm3-p.wm3) AS wm3, (c.wm4-p.wm4) AS wm4 FROM measures AS c LEFT JOIN measures AS p ON p.date = (SELECT MAX(date) FROM measures WHERE date < [c].date)");
+            state2.execute("CREATE VIEW 'heatConsumption' AS SELECT p.date AS 'from', c.date AS 'to', (c.gas-p.gas) AS gas, (c.cm1-p.cm1) AS cm1, (c.cm2-p.cm2) AS cm2, (c.cm3-p.cm3) AS cm3, (c.cm4-p.cm4) AS cm4, (c.cm1+c.cm2+c.cm3+c.cm4-p.cm1-p.cm2-p.cm3-p.cm4) AS 'sum' FROM measures AS c LEFT JOIN measures AS p ON p.date = (SELECT MAX(date) FROM measures WHERE date < [c].date)");
         }
     }
     
@@ -245,7 +245,7 @@ public class Database {
     public ResultSet findMeasure(Date date) throws SQLException {
         try {
             if(con == null) getConnection();
-            PreparedStatement prep = con.prepareStatement("SELECT * FROM 'measures' WHERE 'date' == ?");
+            PreparedStatement prep = con.prepareStatement("SELECT * FROM 'measures' WHERE date == ?");
             prep.setString(1, dateFormat.format(date));
             ResultSet rs = prep.executeQuery();
             return rs;
@@ -258,7 +258,7 @@ public class Database {
     public Date findNearestMeasureDate(Date date) {
         try {
             if(con == null) getConnection();
-            PreparedStatement prep = con.prepareStatement("SELECT min(abs(unixtime-strftime('%s',?)) AS 'var', 'date' FROM 'measuresDate'");
+            PreparedStatement prep = con.prepareStatement("SELECT min(abs(unixtime-strftime('%s',?))) AS 'var', date FROM 'measuresDate'");
             prep.setString(1, dateFormat.format(date));
             ResultSet rs = prep.executeQuery();
             if(rs.next()) {
@@ -290,7 +290,7 @@ public class Database {
     ResultSet findFlat(int flatId) throws SQLException {
         try {
             if(con == null) getConnection();
-            PreparedStatement prep = con.prepareStatement("SELECT * FROM 'flats' WHERE 'rowid' == ?");
+            PreparedStatement prep = con.prepareStatement("SELECT * FROM 'flats' WHERE rowid == ?");
             prep.setInt(1, flatId);
             ResultSet rs = prep.executeQuery();
             return rs;

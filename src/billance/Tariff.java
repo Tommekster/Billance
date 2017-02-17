@@ -39,13 +39,19 @@ public class Tariff {
     static Tariff findTariff(Date validFrom) {
         try {
             ResultSet rs = Database.getInstance().findTariff(validFrom);
+            if(!rs.next()) return null;
             Tariff t = new Tariff();
             t.validFrom = validFrom;
             Field [] fields = Tariff.class.getFields();
             for(Field field : fields){
-                rs.getFloat(field.getName());
+                field.set(t,rs.getFloat(field.getName()));
             }
+            return t;
         } catch (SQLException ex) {
+            Logger.getLogger(Tariff.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(Tariff.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
             Logger.getLogger(Tariff.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

@@ -19,7 +19,7 @@ public class Flat {
     private int id;
     public int waterId;
     public int heatId;
-    public int electricityId;
+    public int eletricityId;
     public int surface;
     
     public static String [] getFlats() throws ClassNotFoundException, SQLException {
@@ -35,14 +35,22 @@ public class Flat {
     static Flat findFlat(int flatId) {
         try {
             ResultSet rs = Database.getInstance().findFlat(flatId);
+            if(!rs.next()) return null;
             Flat f = new Flat();
             f.id = flatId;
             Field [] fields = Flat.class.getFields();
+            System.out.println("Flat:"+fields.length);
             for(Field field : fields){
-                rs.getInt(field.getName());
+                System.out.println(field.getName());
+                field.set(f,rs.getInt(field.getName()));
             }
+            return f;
         } catch (SQLException ex) {
             Logger.getLogger(Tariff.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(Flat.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(Flat.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -56,10 +64,10 @@ public class Flat {
     }
 
     public String getVT() {
-        return "vt"+electricityId;
+        return "vt"+eletricityId;
     }
 
     public String getNT() {
-        return "nt"+electricityId;
+        return "nt"+eletricityId;
     }
 }
