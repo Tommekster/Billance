@@ -8,6 +8,7 @@ package billance;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,6 +37,16 @@ public class Billance extends javax.swing.JFrame {
             // load list of contracts
             flatCmb.setModel(new DefaultComboBoxModel<>(Flat.getFlats()));
             flatCmb.setSelectedIndex(-1);
+            Date currentDate = Calendar.getInstance().getTime();
+            documentText.setText((new SimpleDateFormat("yy000")).format(currentDate));
+            Calendar yearBefore = Calendar.getInstance();
+            yearBefore.add(Calendar.YEAR, -1);
+            beginDate.setText(dateFormat.format(yearBefore.getTime()));
+            endDate.setText(dateFormat.format(currentDate));
+            issueDate.setText(dateFormat.format(currentDate));
+            Calendar nextMonth = Calendar.getInstance();
+            nextMonth.add(Calendar.MONTH,1);
+            dueDate.setText(dateFormat.format(nextMonth.getTime()));
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Unexpected exception\n"+e.getMessage(), "Title", JOptionPane.ERROR_MESSAGE);
         }
@@ -209,7 +220,7 @@ public class Billance extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
