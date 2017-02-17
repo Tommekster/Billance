@@ -11,6 +11,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -19,6 +25,15 @@ import java.sql.Statement;
 public class Database {
     private Connection con;
     private boolean hasData = false;
+    private static Database database = null;
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    
+    private Database(){}
+    
+    public static Database getInstance(){
+        if(database == null) database = new Database();
+        return database;
+    }
 
     private void getConnection() throws ClassNotFoundException, SQLException{
         Class.forName("org.sqlite.JDBC");
@@ -146,5 +161,20 @@ public class Database {
         catch(Exception e){
             con.rollback();
         }
+    }
+    
+    private Date getDate(ResultSet rs, String field) throws SQLException, ParseException{
+        return dateFormat.parse(rs.getString(field));
+    }
+    
+    public Date [] getTarrifs() throws ClassNotFoundException, SQLException, ParseException{
+        if(con == null) getConnection();
+        Statement state = con.createStatement();
+        ResultSet rs = state.executeQuery("SELECT validFrom FROM tariffs ORDER BY validFrom");
+        List<Date> tarrifs = new LinkedList<>();
+        while(rs.next()) {
+            tarrifs.add(getDate(rs,"validFrom"));
+        }
+        return tarrifs.toArray(new Date [0]);
     }
 }
