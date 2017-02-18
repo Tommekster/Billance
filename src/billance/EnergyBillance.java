@@ -51,6 +51,7 @@ public class EnergyBillance {
     int ntEnd;
     int nt;
     boolean includeEletricity;
+    int deposit;
     List<HeatConsumptionRow> heating;
     int days;
     float months;
@@ -60,8 +61,9 @@ public class EnergyBillance {
     private EnergyBillance(){
     }
     
-    public static EnergyBillance loadMeasures(Date from, Date to, Flat flat, Tariff tariff, boolean eletricity){
+    public static EnergyBillance loadMeasures(Date from, Date to, Flat flat, Tariff tariff, boolean eletricity, int deposit){
         EnergyBillance m = new EnergyBillance();
+        m.deposit = deposit;
         m.periodFrom = from;
         m.periodTo = to;
         m.days = (int)((m.periodTo.getTime()-m.periodFrom.getTime())/1000/86400);
@@ -175,6 +177,25 @@ public class EnergyBillance {
 
     Flat getFlat() {
         return flat;
+    }
+    
+    public double getTotalCosts(){
+        double costs = tariff.water*water + tariff.heat*getHeatingEnergy() + tariff.getMonthFee(includeEletricity)*months;
+        if(includeEletricity)
+            costs += tariff.elvt*vt + tariff.elnt*nt;
+        return costs;
+    }
+    
+    public double getDeposit(){
+        return (double) deposit;
+    }
+    
+    public double getBillance(){
+        return getDeposit()-getTotalCosts();
+    }
+    
+    public boolean isOverpaid(){
+        return getBillance() > 0;
     }
     
     static class HeatConsumptionRow {
