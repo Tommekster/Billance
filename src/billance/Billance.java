@@ -360,9 +360,18 @@ public class Billance extends javax.swing.JFrame {
     }//GEN-LAST:event_continueButtonActionPerformed
 
     private void contractCmbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contractCmbActionPerformed
-        //if(evt.getSource() != contractCmb || contractCmb.getSelectedItem() == null) return;
-        //Contract contract = Contract.findConr
-        
+        if(evt.getSource() != contractCmb || contractCmb.getSelectedItem() == null) return;
+        Contract contract = Contract.findContract((String)contractCmb.getSelectedItem());
+        eletricityChck.setSelected(contract.eletricity);
+        String flatId = Integer.toString(contract.flat);
+        for(int i = 0; i < flatCmb.getItemCount(); i++){
+            if(flatCmb.getItemAt(i).equals(flatId)) {
+                flatCmb.setSelectedIndex(i);
+                break;
+            }
+        }
+        beginDate.setText(dateFormat.format(contract.from));
+        endDate.setText(dateFormat.format(contract.to));
     }//GEN-LAST:event_contractCmbActionPerformed
 
     /**

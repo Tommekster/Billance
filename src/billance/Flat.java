@@ -39,17 +39,11 @@ public class Flat {
             Flat f = new Flat();
             f.id = flatId;
             Field [] fields = Flat.class.getFields();
-            System.out.println("Flat:"+fields.length);
             for(Field field : fields){
-                System.out.println(field.getName());
                 field.set(f,rs.getInt(field.getName()));
             }
             return f;
-        } catch (SQLException ex) {
-            Logger.getLogger(Tariff.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(Flat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
+        } catch (SQLException | IllegalArgumentException | IllegalAccessException ex) {
             Logger.getLogger(Flat.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

@@ -47,11 +47,7 @@ public class Tariff {
                 field.set(t,rs.getFloat(field.getName()));
             }
             return t;
-        } catch (SQLException ex) {
-            Logger.getLogger(Tariff.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(Tariff.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
+        } catch (SQLException | IllegalArgumentException | IllegalAccessException ex) {
             Logger.getLogger(Tariff.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

@@ -89,7 +89,7 @@ public class Database {
         if(!res.next()){
             // build the table
             Statement state2 = con.createStatement();
-            state2.execute("CREATE TABLE 'contracts' ('code' TEXT PRIMARY KEY UNIQUE NOT NULL, 'from' DATETIME NOT NULL, 'to' DATETIME, 'flat' INTEGER, 'eletricity' BOOL DEFAULT 'true', 'archived' BOOL DEFAULT 'false' NOT NULL)");
+            state2.execute("CREATE TABLE 'contracts' ('code' TEXT PRIMARY KEY UNIQUE NOT NULL, 'from' DATETIME NOT NULL, 'to' DATETIME, 'flat' INTEGER, 'eletricity' CHAR DEFAULT 1, 'archived' CHAR DEFAULT 0 NOT NULL)");
         }
     }
     
@@ -209,7 +209,7 @@ public class Database {
     public String [] getContracts() throws ClassNotFoundException, SQLException{
         if(con == null) getConnection();
         Statement state = con.createStatement();
-        ResultSet rs = state.executeQuery("SELECT code FROM contracts ORDER BY 'from'");
+        ResultSet rs = state.executeQuery("SELECT code FROM contracts WHERE NOT archived ORDER BY 'from'");
         List<String> contracts = new LinkedList<>();
         while(rs.next()) {
             contracts.add(rs.getString("code"));
@@ -292,6 +292,19 @@ public class Database {
             if(con == null) getConnection();
             PreparedStatement prep = con.prepareStatement("SELECT * FROM 'flats' WHERE rowid == ?");
             prep.setInt(1, flatId);
+            ResultSet rs = prep.executeQuery();
+            return rs;
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    ResultSet findContract(String code) throws SQLException {
+        try {
+            if(con == null) getConnection();
+            PreparedStatement prep = con.prepareStatement("SELECT * FROM 'contracts' WHERE code == ?");
+            prep.setString(1, code);
             ResultSet rs = prep.executeQuery();
             return rs;
         } catch (ClassNotFoundException ex) {
