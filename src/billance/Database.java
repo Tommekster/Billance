@@ -288,7 +288,7 @@ public class Database {
     ResultSet findTariff(Date validFrom) throws SQLException {
         try {
             if(con == null) getConnection();
-            PreparedStatement prep = con.prepareStatement("SELECT * FROM 'tariffs' WHERE 'validFrom' == ?");
+            PreparedStatement prep = con.prepareStatement("SELECT * FROM 'tariffs' WHERE validFrom == ?");
             prep.setString(1, dateFormat.format(validFrom));
             ResultSet rs = prep.executeQuery();
             return rs;
@@ -336,5 +336,18 @@ public class Database {
             Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
         }
         return "";
+    }
+
+    int getFlatsSurface() {
+        try {
+            if(con == null) getConnection();
+            Statement state = con.createStatement();
+            ResultSet rs = state.executeQuery("SELECT sum(surface) AS sum FROM flats");
+            rs.next();
+            return rs.getInt("sum");
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 0;
     }
 }

@@ -21,6 +21,7 @@ public class Flat {
     public int heatId;
     public int eletricityId;
     public int surface;
+    private static int commonSurface = 0;
     
     public static String [] getFlats() throws ClassNotFoundException, SQLException {
         /*Integer [] flats = Database.getInstance().getFlats();
@@ -28,6 +29,11 @@ public class Flat {
         for(int i = 0; i < flats.length; i++) flatNames[i] = Integer.toString(flats[i].intValue());
         return flatNames;*/
         return Database.getInstance().getFlats();
+    }
+    
+    public static int getCommonSurface(){
+        if(commonSurface == 0) commonSurface = Database.getInstance().getFlatsSurface();
+        return commonSurface;
     }
     
     private Flat() {}
@@ -63,5 +69,9 @@ public class Flat {
 
     public String getNT() {
         return "nt"+eletricityId;
+    }
+    
+    public float getFlatCoef(){
+        return (float)surface/((float)getCommonSurface());
     }
 }

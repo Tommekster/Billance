@@ -167,6 +167,14 @@ public class EnergyBillance {
     public HeatTableModel getHeatTableModel(){
         return new HeatTableModel();
     }
+
+    Tariff getTariff() {
+        return tariff;
+    }
+
+    Flat getFlat() {
+        return flat;
+    }
     
     static class HeatConsumptionRow {
         Date from;

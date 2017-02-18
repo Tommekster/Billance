@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -32,28 +33,32 @@ public class Billance extends javax.swing.JFrame {
         initComponents();
         
         try{
-            // load list of tarrifs
-            tarifCmb.setModel(new DefaultComboBoxModel<>(dateList2Strings(Tariff.getTarrifs())));
-            tarifCmb.setSelectedIndex(-1);
-            // load list of contracts
-            contractCmb.setModel(new DefaultComboBoxModel<>(Contract.getContracts()));
-            contractCmb.setSelectedIndex(-1);
-            // load list of contracts
-            flatCmb.setModel(new DefaultComboBoxModel<>(Flat.getFlats()));
-            flatCmb.setSelectedIndex(-1);
-            Date currentDate = Calendar.getInstance().getTime();
-            documentText.setText((new SimpleDateFormat("yy000")).format(currentDate));
-            Calendar yearBefore = Calendar.getInstance();
-            yearBefore.add(Calendar.YEAR, -1);
-            beginDate.setText(dateFormat.format(yearBefore.getTime()));
-            endDate.setText(dateFormat.format(currentDate));
-            issueDate.setText(dateFormat.format(currentDate));
-            Calendar nextMonth = Calendar.getInstance();
-            nextMonth.add(Calendar.MONTH,1);
-            dueDate.setText(dateFormat.format(nextMonth.getTime()));
+            initDefaultValues();
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Unexpected exception\n"+e.getMessage(), "Title", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void initDefaultValues() throws ClassNotFoundException, SQLException, ParseException {
+        // load list of tarrifs
+        tarifCmb.setModel(new DefaultComboBoxModel<>(dateList2Strings(Tariff.getTarrifs())));
+        tarifCmb.setSelectedIndex(-1);
+        // load list of contracts
+        contractCmb.setModel(new DefaultComboBoxModel<>(Contract.getContracts()));
+        contractCmb.setSelectedIndex(-1);
+        // load list of contracts
+        flatCmb.setModel(new DefaultComboBoxModel<>(Flat.getFlats()));
+        flatCmb.setSelectedIndex(-1);
+        Date currentDate = Calendar.getInstance().getTime();
+        documentText.setText((new SimpleDateFormat("yy000")).format(currentDate));
+        Calendar yearBefore = Calendar.getInstance();
+        yearBefore.add(Calendar.YEAR, -1);
+        beginDate.setText(dateFormat.format(yearBefore.getTime()));
+        endDate.setText(dateFormat.format(currentDate));
+        issueDate.setText(dateFormat.format(currentDate));
+        Calendar nextMonth = Calendar.getInstance();
+        nextMonth.add(Calendar.MONTH,1);
+        dueDate.setText(dateFormat.format(nextMonth.getTime()));
     }
 
     /**
@@ -97,6 +102,24 @@ public class Billance extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         summaryTable = new javax.swing.JTable();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        volumeCoef = new javax.swing.JLabel();
+        combustionHeat = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        gasCons = new javax.swing.JLabel();
+        heatCons = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        flatCoef = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        consPart = new javax.swing.JLabel();
+        commonHeatCons = new javax.swing.JLabel();
+        heating = new javax.swing.JLabel();
+        basicPart = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Billance");
@@ -273,6 +296,51 @@ public class Billance extends javax.swing.JFrame {
         ));
         jScrollPane4.setViewportView(summaryTable);
 
+        jLabel13.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel13.setText("spalné teplo (kWh/m3):");
+
+        jLabel14.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel14.setText("objemový koeficient: ");
+
+        volumeCoef.setText("0.000");
+
+        combustionHeat.setText("0.000");
+
+        jLabel17.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel17.setText("spotřeba nepřepočtená: ");
+
+        jLabel18.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel18.setText("spotřeba přepočtená: ");
+
+        gasCons.setText("0,000 m3");
+
+        heatCons.setText("0 kWh");
+
+        jLabel21.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel21.setText("bytový koeficient:");
+
+        flatCoef.setText("0.000");
+
+        jLabel23.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel23.setText("hromadná spotřeba: ");
+
+        jLabel24.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel24.setText("spotřební složka: ");
+
+        jLabel25.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel25.setText("základní složka");
+
+        jLabel26.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel26.setText("spotřeba: ");
+
+        consPart.setText("0 kWh");
+
+        commonHeatCons.setText("0 kWh");
+
+        heating.setText("0 kWh");
+
+        basicPart.setText("0 kWh");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -280,20 +348,54 @@ public class Billance extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel10)
-                            .addComponent(jLabel11))
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 562, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                                 .addComponent(jLabel12)
                                 .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel10)
+                            .addComponent(jLabel11)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel13)
+                                    .addComponent(jLabel14)
+                                    .addComponent(jLabel21))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(combustionHeat)
+                                    .addComponent(volumeCoef)
+                                    .addComponent(flatCoef))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(jLabel17)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(gasCons))
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel18)
+                                            .addComponent(jLabel23))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(commonHeatCons)
+                                            .addComponent(heatCons))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel24)
+                                    .addComponent(jLabel26)
+                                    .addComponent(jLabel25))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(basicPart)
+                                    .addComponent(heating)
+                                    .addComponent(consPart))))
+                        .addGap(0, 59, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -306,7 +408,31 @@ public class Billance extends javax.swing.JFrame {
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel13)
+                    .addComponent(combustionHeat)
+                    .addComponent(jLabel17)
+                    .addComponent(gasCons)
+                    .addComponent(jLabel25)
+                    .addComponent(basicPart))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel14)
+                    .addComponent(volumeCoef)
+                    .addComponent(jLabel18)
+                    .addComponent(heatCons)
+                    .addComponent(jLabel24)
+                    .addComponent(consPart))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel21)
+                    .addComponent(flatCoef)
+                    .addComponent(jLabel23)
+                    .addComponent(jLabel26)
+                    .addComponent(commonHeatCons)
+                    .addComponent(heating))
+                .addGap(18, 18, 18)
                 .addComponent(jLabel12)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -352,8 +478,19 @@ public class Billance extends javax.swing.JFrame {
             Tariff tariff = Tariff.findTariff(dateFormat.parse((String) tarifCmb.getSelectedItem()));
             
             EnergyBillance billance = EnergyBillance.loadMeasures(from, to, flat, tariff, eletricityChck.isSelected());
-            measuredServicesTable.setModel(billance.getMeasuresTableModel());
+            measuredServicesTable.setModel(billance.getServicesTableModel());
             heatconsumptionTable.setModel(billance.getHeatTableModel());
+            DecimalFormat floatFormat = new DecimalFormat("#.000");
+            DecimalFormat floatShortFormat = new DecimalFormat("#.0");
+            combustionHeat.setText(floatFormat.format(billance.getTariff().getCombustionHeat()));
+            volumeCoef.setText(floatFormat.format(billance.getTariff().getVolumeCoeficient()));
+            flatCoef.setText(floatFormat.format(billance.getFlat().getFlatCoef()));
+            gasCons.setText(floatFormat.format(billance.getGasConsumption())+" m3");
+            heatCons.setText(floatFormat.format(billance.getMeasuredHeatConsumption())+" kWh");
+            commonHeatCons.setText(floatFormat.format(billance.getCommonHeat())+" kWh");
+            basicPart.setText(floatFormat.format(billance.getBasicHeatPart())+" kWh");
+            consPart.setText(floatFormat.format(billance.getConsumptionHeatPart())+" kWh");
+            heating.setText(floatFormat.format(billance.getHeatingEnergy())+" kWh");
         } catch (ParseException ex) {
             JOptionPane.showMessageDialog(this, "Some fields has incorrect values. ", "Incorrect fields", JOptionPane.ERROR_MESSAGE);
         }
@@ -362,6 +499,10 @@ public class Billance extends javax.swing.JFrame {
     private void contractCmbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contractCmbActionPerformed
         if(evt.getSource() != contractCmb || contractCmb.getSelectedItem() == null) return;
         Contract contract = Contract.findContract((String)contractCmb.getSelectedItem());
+        loadValuesFromContract(contract);
+    }//GEN-LAST:event_contractCmbActionPerformed
+
+    private void loadValuesFromContract(Contract contract) {
         eletricityChck.setSelected(contract.eletricity);
         String flatId = Integer.toString(contract.flat);
         for(int i = 0; i < flatCmb.getItemCount(); i++){
@@ -373,7 +514,7 @@ public class Billance extends javax.swing.JFrame {
         beginDate.setText(dateFormat.format(contract.from));
         endDate.setText(dateFormat.format(contract.to));
         personText.setText(contract.getPersons());
-    }//GEN-LAST:event_contractCmbActionPerformed
+    }
 
     /**
      * @param args the command line arguments
@@ -438,7 +579,11 @@ public class Billance extends javax.swing.JFrame {
 
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel basicPart;
     private javax.swing.JTextField beginDate;
+    private javax.swing.JLabel combustionHeat;
+    private javax.swing.JLabel commonHeatCons;
+    private javax.swing.JLabel consPart;
     private javax.swing.JButton continueButton;
     private javax.swing.JComboBox<String> contractCmb;
     private javax.swing.JTextField documentText;
@@ -446,13 +591,26 @@ public class Billance extends javax.swing.JFrame {
     private javax.swing.JCheckBox eletricityChck;
     private javax.swing.JTextField endDate;
     private javax.swing.JComboBox<String> flatCmb;
+    private javax.swing.JLabel flatCoef;
+    private javax.swing.JLabel gasCons;
+    private javax.swing.JLabel heatCons;
     private javax.swing.JTable heatconsumptionTable;
+    private javax.swing.JLabel heating;
     private javax.swing.JTextField issueDate;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -470,6 +628,7 @@ public class Billance extends javax.swing.JFrame {
     private javax.swing.JTextField personText;
     private javax.swing.JTable summaryTable;
     private javax.swing.JComboBox<String> tarifCmb;
+    private javax.swing.JLabel volumeCoef;
     // End of variables declaration//GEN-END:variables
 
     
