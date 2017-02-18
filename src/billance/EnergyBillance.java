@@ -54,6 +54,8 @@ public class EnergyBillance {
     List<HeatConsumptionRow> heating;
     int days;
     float months;
+    double gasFlat;
+    int gasCommon;
     
     private EnergyBillance(){
     }
@@ -107,6 +109,8 @@ public class EnergyBillance {
         ResultSet result = Database.getInstance().findHeatConsumption(nearestFrom,nearestTo);
         heating = new LinkedList<>();
         DateFormat df = Database.getDateFormat();
+        gasFlat = 0;
+        gasCommon = 0;
         while(result.next()) {
             HeatConsumptionRow hcr = new HeatConsumptionRow();
             hcr.from = df.parse(result.getString("from"));
@@ -116,11 +120,14 @@ public class EnergyBillance {
             hcr.tm = result.getInt(flat.getTM());
             hcr.countFraction();
             heating.add(hcr);
+            
+            gasFlat += hcr.gasFraction;
+            gasCommon += hcr.gas;
         }
     }
     
-    private double getGasEnergy(int volumeGas) {
-        return ((double)volumeGas)*tariff.getVolumeCoeficient()*tariff.getCombustionHeat();
+    private double getGasEnergy(double volumeGas) {
+        return volumeGas*tariff.getVolumeCoeficient()*tariff.getCombustionHeat();
     }
     
     private void countConsumption() {
@@ -129,8 +136,32 @@ public class EnergyBillance {
         nt = ntEnd - ntBeg;
     }
     
-    public MeasuresTableModel getMeasuresTableModel(){
-        return new MeasuresTableModel();
+    public double getGasConsumption(){
+        return gasFlat;
+    }
+    
+    public double getMeasuredHeatConsumption(){
+        return getGasEnergy(gasFlat);
+    }
+    
+    public double getCommonHeat(){
+        return getGasEnergy(gasCommon);
+    }
+    
+    public double getBasicHeatPart(){
+        return getCommonHeat()*flat.getFlatCoef()*tariff.surfaceCoef;
+    }
+    
+    public double getConsumptionHeatPart(){
+        return getMeasuredHeatConsumption()*(1-tariff.surfaceCoef);
+    }
+    
+    public double getHeatingEnergy(){
+        return getBasicHeatPart()+getConsumptionHeatPart();
+    }
+    
+    public ServicesTableModel getServicesTableModel(){
+        return new ServicesTableModel();
     }
     
     public HeatTableModel getHeatTableModel(){
@@ -144,12 +175,14 @@ public class EnergyBillance {
         int tm;
         int tm_sum;
         float fraction;
+        float gasFraction;
         public void countFraction(){
             fraction = (tm_sum > 0)?(float)tm/((float)tm_sum):0;
+            gasFraction = gas*fraction;
         }
     }
     
-    public class MeasuresTableModel extends AbstractTableModel{
+    public class ServicesTableModel extends AbstractTableModel{
         private final String[] columnNames = {ResourceBundle.getBundle("billance/Services").getString("serviceName"),
             ResourceBundle.getBundle("billance/Services").getString("serviceFrom"),
             ResourceBundle.getBundle("billance/Services").getString("serviceTo"),
@@ -191,7 +224,7 @@ public class EnergyBillance {
         public MeasuresTableModel(Measures measures){
             this.measures = measures;
         }*/
-        public MeasuresTableModel(){ }
+        public ServicesTableModel(){ }
         
         @Override
         public String getColumnName(int col) {
@@ -299,11 +332,9 @@ public class EnergyBillance {
                 case 4:
                     return fractionFormat.format(hcr.fraction);
                 case 5:
-                    return floatFormat.format(hcr.gas*hcr.fraction);
+                    return floatFormat.format(hcr.gasFraction);
                 case 6:
                     return hcr.gas;
-                    
-
             }
             return null;
         }
