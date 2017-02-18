@@ -478,23 +478,27 @@ public class Billance extends javax.swing.JFrame {
             Tariff tariff = Tariff.findTariff(dateFormat.parse((String) tarifCmb.getSelectedItem()));
             
             EnergyBillance billance = EnergyBillance.loadMeasures(from, to, flat, tariff, eletricityChck.isSelected());
-            measuredServicesTable.setModel(billance.getServicesTableModel());
-            heatconsumptionTable.setModel(billance.getHeatTableModel());
-            DecimalFormat floatFormat = new DecimalFormat("#.000");
-            DecimalFormat floatShortFormat = new DecimalFormat("#.0");
-            combustionHeat.setText(floatFormat.format(billance.getTariff().getCombustionHeat()));
-            volumeCoef.setText(floatFormat.format(billance.getTariff().getVolumeCoeficient()));
-            flatCoef.setText(floatFormat.format(billance.getFlat().getFlatCoef()));
-            gasCons.setText(floatFormat.format(billance.getGasConsumption())+" m3");
-            heatCons.setText(floatFormat.format(billance.getMeasuredHeatConsumption())+" kWh");
-            commonHeatCons.setText(floatFormat.format(billance.getCommonHeat())+" kWh");
-            basicPart.setText(floatFormat.format(billance.getBasicHeatPart())+" kWh");
-            consPart.setText(floatFormat.format(billance.getConsumptionHeatPart())+" kWh");
-            heating.setText(floatFormat.format(billance.getHeatingEnergy())+" kWh");
+            displayEnergyBillance(billance);
         } catch (ParseException ex) {
             JOptionPane.showMessageDialog(this, "Some fields has incorrect values. ", "Incorrect fields", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_continueButtonActionPerformed
+
+    private void displayEnergyBillance(EnergyBillance billance) {
+        measuredServicesTable.setModel(billance.getServicesTableModel());
+        heatconsumptionTable.setModel(billance.getHeatTableModel());
+        DecimalFormat floatFormat = new DecimalFormat("0.000");
+        DecimalFormat floatShortFormat = new DecimalFormat("#,##0.0");
+        combustionHeat.setText(floatFormat.format(billance.getTariff().getCombustionHeat()));
+        volumeCoef.setText(floatFormat.format(billance.getTariff().getVolumeCoeficient()));
+        flatCoef.setText(floatFormat.format(billance.getFlat().getFlatCoef()));
+        gasCons.setText(floatShortFormat.format(billance.getGasConsumption())+" m3");
+        heatCons.setText(floatShortFormat.format(billance.getMeasuredHeatConsumption())+" kWh");
+        commonHeatCons.setText(floatShortFormat.format(billance.getCommonHeat())+" kWh");
+        basicPart.setText(floatShortFormat.format(billance.getBasicHeatPart())+" kWh");
+        consPart.setText(floatShortFormat.format(billance.getConsumptionHeatPart())+" kWh");
+        heating.setText(floatShortFormat.format(billance.getHeatingEnergy())+" kWh");
+    }
 
     private void contractCmbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contractCmbActionPerformed
         if(evt.getSource() != contractCmb || contractCmb.getSelectedItem() == null) return;

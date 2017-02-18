@@ -226,7 +226,7 @@ public class EnergyBillance {
         }
         
         private final DateFormat dateFormat = new SimpleDateFormat(ResourceBundle.getBundle("billance/Services").getString("dateFormat"));
-        private final DecimalFormat floatFormat = new DecimalFormat("#.###");
+        private final DecimalFormat floatFormat = new DecimalFormat("#.000");
         /*private Measures measures;
         
         public MeasuresTableModel(Measures measures){
@@ -301,8 +301,8 @@ public class EnergyBillance {
             ResourceBundle.getBundle("billance/Services").getString("heatGasConsumptionSum")};
         
         private final DateFormat dateFormat = new SimpleDateFormat(ResourceBundle.getBundle("billance/Services").getString("dateFormat"));
-        private final DecimalFormat fractionFormat = new DecimalFormat("#.# %");
-        private final DecimalFormat floatFormat = new DecimalFormat("#.###");
+        private final DecimalFormat fractionFormat = new DecimalFormat("0.0 %");
+        private final DecimalFormat floatFormat = new DecimalFormat("0.000");
         /*private Measures measures;
         
         public MeasuresTableModel(Measures measures){
