@@ -52,4 +52,8 @@ public class Contract {
         }
         return null;
     }
+    
+    public String getPersons(){
+        return Database.getInstance().getContractPersons(code);
+    }
 }

@@ -372,6 +372,7 @@ public class Billance extends javax.swing.JFrame {
         }
         beginDate.setText(dateFormat.format(contract.from));
         endDate.setText(dateFormat.format(contract.to));
+        personText.setText(contract.getPersons());
     }//GEN-LAST:event_contractCmbActionPerformed
 
     /**

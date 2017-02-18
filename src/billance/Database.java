@@ -59,6 +59,7 @@ public class Database {
             checkTariffsTable();
             checkMeasuresDateView();
             checkHeatConsumptionView();
+            checkContractPersonsView();
         }
     }
 
@@ -153,6 +154,16 @@ public class Database {
             // build the table
             Statement state2 = con.createStatement();
             state2.execute("CREATE VIEW 'heatConsumption' AS SELECT p.date AS 'from', c.date AS 'to', (c.gas-p.gas) AS gas, (c.cm1-p.cm1) AS cm1, (c.cm2-p.cm2) AS cm2, (c.cm3-p.cm3) AS cm3, (c.cm4-p.cm4) AS cm4, (c.cm1+c.cm2+c.cm3+c.cm4-p.cm1-p.cm2-p.cm3-p.cm4) AS 'sum' FROM measures AS c LEFT JOIN measures AS p ON p.date = (SELECT MAX(date) FROM measures WHERE date < [c].date)");
+        }
+    }
+    
+    private void checkContractPersonsView() throws SQLException {
+        Statement state = con.createStatement();
+        ResultSet res = state.executeQuery("SELECT name FROM sqlite_master WHERE type='view' AND name = 'contractPersons'");
+        if(!res.next()){
+            // build the table
+            Statement state2 = con.createStatement();
+            state2.execute("CREATE VIEW contractPersons AS SELECT c.contract, group_concat(p.name || ' ' || p.surname,', ') AS names FROM persons AS p JOIN personcontracts AS c ON p.rowid == c.person GROUP BY c.contract");
         }
     }
     
@@ -311,5 +322,19 @@ public class Database {
             Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    String getContractPersons(String code) {
+        try {
+            if(con == null) getConnection();
+            PreparedStatement prep = con.prepareStatement("SELECT names FROM 'contractPersons' WHERE contract == ?");
+            prep.setString(1, code);
+            ResultSet rs = prep.executeQuery();
+            if(!rs.next()) return "";
+            return rs.getString("names");
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
     }
 }
