@@ -487,6 +487,7 @@ public class Billance extends javax.swing.JFrame {
     private void displayEnergyBillance(EnergyBillance billance) {
         measuredServicesTable.setModel(billance.getServicesTableModel());
         heatconsumptionTable.setModel(billance.getHeatTableModel());
+        summaryTable.setModel(billance.getSummaryTableModel());
         DecimalFormat floatFormat = new DecimalFormat("0.000");
         DecimalFormat floatShortFormat = new DecimalFormat("#,##0.0");
         combustionHeat.setText(floatFormat.format(billance.getTariff().getCombustionHeat()));

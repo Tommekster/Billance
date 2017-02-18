@@ -74,10 +74,7 @@ public class EnergyBillance {
         try {
             m.loadValues();
             m.loadHeatConsumption();
-        } catch (SQLException ex) {
-            Logger.getLogger(EnergyBillance.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        } catch (ParseException ex) {
+        } catch (SQLException | ParseException ex) {
             Logger.getLogger(EnergyBillance.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
@@ -167,6 +164,10 @@ public class EnergyBillance {
     public HeatTableModel getHeatTableModel(){
         return new HeatTableModel();
     }
+    
+    public SummaryTableModel getSummaryTableModel(){
+        return new SummaryTableModel();
+    }
 
     Tariff getTariff() {
         return tariff;
@@ -218,7 +219,7 @@ public class EnergyBillance {
             rows.add(new ServiceRow(ResourceBundle.getBundle("billance/Services").getString("heat"),
                 nearestFrom,nearestTo,
                 ResourceBundle.getBundle("billance/Services").getString("heatUnit"),
-                "","",""));
+                "","",getHeatingEnergy()));
             rows.add(new ServiceRow(ResourceBundle.getBundle("billance/Services").getString("monthlyFee"),
                 periodFrom,periodTo,
                 ResourceBundle.getBundle("billance/Services").getString("monthlyFeeUnit"),
@@ -276,13 +277,13 @@ public class EnergyBillance {
                     Field field = this.getClass().getFields()[index];
                     Object val = field.get(this);
                     if(val instanceof Date)
-                        return dateFormat.format(field.get(this));
+                        return dateFormat.format(val);
                     if(val instanceof Integer)
-                        return Integer.toString((int) field.get(this));
+                        return Integer.toString((int) val);
                     if(val instanceof Float)
-                        return floatFormat.format(field.get(this));
+                        return floatFormat.format(val);
                     if(val instanceof String)
-                        return (String) field.get(this);
+                        return (String) val;
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     Logger.getLogger(EnergyBillance.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -345,6 +346,104 @@ public class EnergyBillance {
                     return hcr.gas;
             }
             return null;
+        }
+    }
+    
+    public class SummaryTableModel extends AbstractTableModel{
+        private final String[] columnNames = {ResourceBundle.getBundle("billance/Services").getString("summaryName"),
+            ResourceBundle.getBundle("billance/Services").getString("summaryAmount"),
+            ResourceBundle.getBundle("billance/Services").getString("summaryUnit"),
+            ResourceBundle.getBundle("billance/Services").getString("summaryCost"),
+            ResourceBundle.getBundle("billance/Services").getString("summaryUnitPrice")};
+        
+        List<SummaryRow> rows = new LinkedList<>();
+        {
+            rows.add(new SummaryRow(ResourceBundle.getBundle("billance/Services").getString("water"),
+                water,
+                ResourceBundle.getBundle("billance/Services").getString("waterUnit"),
+                tariff.water*water,tariff.water));
+            if(includeEletricity){
+                rows.add(new SummaryRow(ResourceBundle.getBundle("billance/Services").getString("electricityVT"),
+                    vt,
+                    ResourceBundle.getBundle("billance/Services").getString("electricityVTUnit"),
+                    tariff.elvt*vt,tariff.elvt));
+                rows.add(new SummaryRow(ResourceBundle.getBundle("billance/Services").getString("electricityNT"),
+                    nt,
+                    ResourceBundle.getBundle("billance/Services").getString("electricityNTUnit"),
+                    tariff.elnt*nt,tariff.elnt));
+            }
+            rows.add(new SummaryRow(ResourceBundle.getBundle("billance/Services").getString("heat"),
+                getHeatingEnergy(),
+                ResourceBundle.getBundle("billance/Services").getString("heatUnit"),
+                tariff.heat*getHeatingEnergy(),tariff.heat));
+            rows.add(new SummaryRow(ResourceBundle.getBundle("billance/Services").getString("monthlyFee"),
+                months,
+                ResourceBundle.getBundle("billance/Services").getString("monthlyFeeUnit"),
+                tariff.getMonthFee(includeEletricity)*months,tariff.getMonthFee(includeEletricity)));
+        }
+        
+        private final DateFormat dateFormat = new SimpleDateFormat(ResourceBundle.getBundle("billance/Services").getString("dateFormat"));
+        private final DecimalFormat floatFormat = new DecimalFormat("0.000");
+        private final DecimalFormat currencyFormat = new DecimalFormat("#,##0.00 Kč");
+        /*private Measures measures;
+        
+        public MeasuresTableModel(Measures measures){
+            this.measures = measures;
+        }*/
+        public SummaryTableModel(){ }
+        
+        @Override
+        public String getColumnName(int col) {
+            return columnNames[col];
+        }
+        
+        @Override
+        public int getRowCount() {
+            return rows.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return columnNames.length;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            return rows.get(rowIndex).getItem(columnIndex);
+        }
+        
+        class SummaryRow{
+            public String service;
+            public Object amount;
+            public String unit;
+            public double cost;
+            public double unitPrice;
+            public SummaryRow(String service, Object amount, String unit, double cost, double unitPrice){
+                this.service = service;
+                this.amount = amount;
+                this.unit = unit;
+                this.cost = cost;
+                this.unitPrice = unitPrice;
+            }
+            String getItem(int index){
+                try {
+                    Field field = this.getClass().getFields()[index];
+                    Object val = field.get(this);
+                    if(field.getType().getName().equals(double.class.getTypeName()))
+                        return currencyFormat.format(val);
+                    if(val instanceof Date)
+                        return dateFormat.format(val);
+                    if(val instanceof Integer)
+                        return Integer.toString((int) val);
+                    if(val instanceof Float || val instanceof Double)
+                        return floatFormat.format(val);
+                    if(val instanceof String)
+                        return (String) val;
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    Logger.getLogger(EnergyBillance.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return "";
+            }
         }
     }
 }

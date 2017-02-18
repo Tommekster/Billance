@@ -60,4 +60,8 @@ public class Tariff {
     double getCombustionHeat() {
         return combustionHeat;
     }
+    
+    double getMonthFee(boolean eletricity){
+        return fee+((eletricity)?elfee:0);
+    }
 }
