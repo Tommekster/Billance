@@ -15,6 +15,7 @@
  */
 package billance;
 
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -49,6 +50,7 @@ public class EnergyBillance {
     int ntBeg;
     int ntEnd;
     int nt;
+    boolean includeEletricity;
     List<HeatConsumptionRow> heating;
     int days;
     float months;
@@ -56,7 +58,7 @@ public class EnergyBillance {
     private EnergyBillance(){
     }
     
-    public static EnergyBillance loadMeasures(Date from, Date to, Flat flat, Tariff tariff){
+    public static EnergyBillance loadMeasures(Date from, Date to, Flat flat, Tariff tariff, boolean eletricity){
         EnergyBillance m = new EnergyBillance();
         m.periodFrom = from;
         m.periodTo = to;
@@ -65,6 +67,7 @@ public class EnergyBillance {
         m.flat = flat;
         m.findNearestDates();
         m.tariff = tariff;
+        m.includeEletricity = eletricity;
         if(m.nearestFrom == null || m.nearestTo == null) return null;
         try {
             m.loadValues();
@@ -154,18 +157,32 @@ public class EnergyBillance {
             ResourceBundle.getBundle("billance/Services").getString("serviceBegin"),
             ResourceBundle.getBundle("billance/Services").getString("serviceEnd"),
             ResourceBundle.getBundle("billance/Services").getString("serviceConsumption")};
-        private final String[] services = {ResourceBundle.getBundle("billance/Services").getString("water"),
-            ResourceBundle.getBundle("billance/Services").getString("electricityVT"),
-            ResourceBundle.getBundle("billance/Services").getString("electricityNT"),
-            ResourceBundle.getBundle("billance/Services").getString("electricityFee"),
-            ResourceBundle.getBundle("billance/Services").getString("heat"),
-            ResourceBundle.getBundle("billance/Services").getString("monthlyFee")};
-        private final String[] units = {ResourceBundle.getBundle("billance/Services").getString("waterUnit"),
-            ResourceBundle.getBundle("billance/Services").getString("electricityVTUnit"),
-            ResourceBundle.getBundle("billance/Services").getString("electricityNTUnit"),
-            ResourceBundle.getBundle("billance/Services").getString("electricityFeeUnit"),
-            ResourceBundle.getBundle("billance/Services").getString("heatUnit"),
-            ResourceBundle.getBundle("billance/Services").getString("monthlyFeeUnit")};
+        
+        List<ServiceRow> rows = new LinkedList<>();
+        {
+            rows.add(new ServiceRow(ResourceBundle.getBundle("billance/Services").getString("water"),
+                nearestFrom,nearestTo,
+                ResourceBundle.getBundle("billance/Services").getString("waterUnit"),
+                waterBeg,waterEnd,water));
+            if(includeEletricity){
+                rows.add(new ServiceRow(ResourceBundle.getBundle("billance/Services").getString("electricityVT"),
+                    nearestFrom,nearestTo,
+                    ResourceBundle.getBundle("billance/Services").getString("electricityVTUnit"),
+                    vtBeg,vtEnd,vt));
+                rows.add(new ServiceRow(ResourceBundle.getBundle("billance/Services").getString("electricityNT"),
+                    nearestFrom,nearestTo,
+                    ResourceBundle.getBundle("billance/Services").getString("electricityNTUnit"),
+                    ntBeg,ntEnd,nt));
+            }
+            rows.add(new ServiceRow(ResourceBundle.getBundle("billance/Services").getString("heat"),
+                nearestFrom,nearestTo,
+                ResourceBundle.getBundle("billance/Services").getString("heatUnit"),
+                "","",""));
+            rows.add(new ServiceRow(ResourceBundle.getBundle("billance/Services").getString("monthlyFee"),
+                periodFrom,periodTo,
+                ResourceBundle.getBundle("billance/Services").getString("monthlyFeeUnit"),
+                periodFrom,periodTo,months));
+        }
         
         private final DateFormat dateFormat = new SimpleDateFormat(ResourceBundle.getBundle("billance/Services").getString("dateFormat"));
         private final DecimalFormat floatFormat = new DecimalFormat("#.###");
@@ -174,7 +191,7 @@ public class EnergyBillance {
         public MeasuresTableModel(Measures measures){
             this.measures = measures;
         }*/
-        public MeasuresTableModel(){}
+        public MeasuresTableModel(){ }
         
         @Override
         public String getColumnName(int col) {
@@ -183,7 +200,7 @@ public class EnergyBillance {
         
         @Override
         public int getRowCount() {
-            return services.length;
+            return rows.size();
         }
 
         @Override
@@ -193,68 +210,43 @@ public class EnergyBillance {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
+            return rows.get(rowIndex).getItem(columnIndex);
+        }
         
-            switch(columnIndex){
-                case 0:
-                    return services[rowIndex];
-                case 1: // from
-                    if(rowIndex == 3 || rowIndex == 5) 
-                        return dateFormat.format(periodFrom);
-                    else 
-                        return dateFormat.format(nearestFrom);
-                case 2: // to
-                    if(rowIndex == 3 || rowIndex == 5) 
-                        return dateFormat.format(periodTo);
-                    else 
-                        return dateFormat.format(nearestTo);
-                case 3: 
-                    return units[rowIndex];
-                case 4: // begin
-                    switch(rowIndex){
-                        case 0: 
-                            return waterBeg;
-                        case 1:
-                            return vtBeg;
-                        case 2:
-                            return ntBeg;
-                        case 4:
-                            return "";
-                        case 3:
-                        case 5:
-                            return dateFormat.format(periodFrom);
-                    }
-                case 5: // end
-                    switch(rowIndex){
-                        case 0: 
-                            return waterEnd;
-                        case 1:
-                            return vtEnd;
-                        case 2:
-                            return ntEnd;
-                        case 4:
-                            return "";
-                        case 3:
-                        case 5:
-                            return dateFormat.format(periodTo);
-                    }
-                case 6: // consumption
-                    switch(rowIndex){
-                        case 0: 
-                            return water;
-                        case 1:
-                            return vt;
-                        case 2:
-                            return nt;
-                        case 4:
-                            return "";
-                        case 3:
-                        case 5:
-                            return floatFormat.format(months); //String.format(%.3f, months);
-                    }
-                    return "";
-
+        class ServiceRow{
+            public String name;
+            public Date from;
+            public Date to;
+            public String unit;
+            public Object begin;
+            public Object end;
+            public Object consumption;
+            public ServiceRow(String name,Date from,Date to,String unit,Object begin,Object end,Object consumption){
+                this.name = name;
+                this.from = from;
+                this.to = to;
+                this.unit = unit;
+                this.begin = begin;
+                this.end = end;
+                this.consumption = consumption;
             }
-            return null;
+            String getItem(int index){
+                try {
+                    Field field = this.getClass().getFields()[index];
+                    Object val = field.get(this);
+                    if(val instanceof Date)
+                        return dateFormat.format(field.get(this));
+                    if(val instanceof Integer)
+                        return Integer.toString((int) field.get(this));
+                    if(val instanceof Float)
+                        return floatFormat.format(field.get(this));
+                    if(val instanceof String)
+                        return (String) field.get(this);
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    Logger.getLogger(EnergyBillance.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return "";
+            }
         }
     }
     

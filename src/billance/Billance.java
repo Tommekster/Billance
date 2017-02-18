@@ -351,7 +351,7 @@ public class Billance extends javax.swing.JFrame {
             Flat flat = Flat.findFlat(Integer.parseInt((String) flatCmb.getSelectedItem()));
             Tariff tariff = Tariff.findTariff(dateFormat.parse((String) tarifCmb.getSelectedItem()));
             
-            EnergyBillance billance = EnergyBillance.loadMeasures(from, to, flat, tariff);
+            EnergyBillance billance = EnergyBillance.loadMeasures(from, to, flat, tariff, eletricityChck.isSelected());
             measuredServicesTable.setModel(billance.getMeasuresTableModel());
             heatconsumptionTable.setModel(billance.getHeatTableModel());
         } catch (ParseException ex) {
