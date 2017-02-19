@@ -7,6 +7,7 @@ package billance;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.HeadlessException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -94,6 +95,7 @@ public class Billance extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         depositText = new javax.swing.JTextField();
         jLabel16 = new javax.swing.JLabel();
+        exportBtn = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
@@ -171,7 +173,7 @@ public class Billance extends javax.swing.JFrame {
 
         dueDate.setText("dd.MM.yyyy");
 
-        continueButton.setText("Continue");
+        continueButton.setText("Preview");
         continueButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 continueButtonActionPerformed(evt);
@@ -186,6 +188,14 @@ public class Billance extends javax.swing.JFrame {
 
         jLabel16.setText("Kč");
 
+        exportBtn.setText("Export");
+        exportBtn.setEnabled(false);
+        exportBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -195,19 +205,11 @@ public class Billance extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(continueButton))
+                        .addComponent(continueButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(exportBtn))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(73, 73, 73)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(tarifCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(contractCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(eletricityChck)
-                                    .addComponent(flatCmb, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel4)
@@ -228,7 +230,17 @@ public class Billance extends javax.swing.JFrame {
                                     .addComponent(personText, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(endDate, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(beginDate, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(documentText, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(documentText, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(73, 73, 73)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(tarifCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(contractCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(eletricityChck)
+                                    .addComponent(flatCmb, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -278,9 +290,11 @@ public class Billance extends javax.swing.JFrame {
                     .addComponent(jLabel15)
                     .addComponent(depositText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel16))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(continueButton)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(continueButton)
+                    .addComponent(exportBtn))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jScrollPane1.setToolTipText("");
@@ -487,7 +501,7 @@ public class Billance extends javax.swing.JFrame {
                                     .addComponent(basicPart)
                                     .addComponent(heating)
                                     .addComponent(consPart))))
-                        .addGap(0, 59, Short.MAX_VALUE))))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -547,7 +561,7 @@ public class Billance extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -557,7 +571,7 @@ public class Billance extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 124, Short.MAX_VALUE))
+                        .addGap(0, 193, Short.MAX_VALUE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -578,10 +592,15 @@ public class Billance extends javax.swing.JFrame {
             
             EnergyBillance billance = EnergyBillance.loadMeasures(from, to, flat, tariff, eletricityChck.isSelected(), deposit);
             displayEnergyBillance(billance);
+            setEnergyBillance(billance);
         } catch (NumberFormatException | ParseException ex) {
-            JOptionPane.showMessageDialog(this, "Some fields has incorrect values. ", "Incorrect fields", JOptionPane.ERROR_MESSAGE);
+            incorrectFields();
         }
     }//GEN-LAST:event_continueButtonActionPerformed
+
+    private void incorrectFields() throws HeadlessException {
+        JOptionPane.showMessageDialog(this, "Some fields has incorrect values. ", "Incorrect fields", JOptionPane.ERROR_MESSAGE);
+    }
 
     private void displayEnergyBillance(EnergyBillance billance) {
         measuredServicesTable.setModel(billance.getServicesTableModel());
@@ -609,6 +628,20 @@ public class Billance extends javax.swing.JFrame {
         Contract contract = Contract.findContract((String)contractCmb.getSelectedItem());
         loadValuesFromContract(contract);
     }//GEN-LAST:event_contractCmbActionPerformed
+
+    private void exportBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportBtnActionPerformed
+        try {
+            TexExport.DocumentPreambule preambule = new TexExport.DocumentPreambule(
+                    documentText.getText(),
+                    contractCmb.getSelectedItem().toString(),
+                    personText.getText(),
+                    getDateValue(issueDate), getDateValue(dueDate));
+            BillanceExporter be = new TexExport(energyBillance, preambule);
+            be.export();
+        } catch (ParseException ex) {
+            incorrectFields();
+        }
+    }//GEN-LAST:event_exportBtnActionPerformed
 
     private void loadValuesFromContract(Contract contract) {
         eletricityChck.setSelected(contract.eletricity);
@@ -694,8 +727,14 @@ public class Billance extends javax.swing.JFrame {
     private void incorrectComponent(Component component) {
         component.setBackground(Color.pink);
     }
+    
+    private void setEnergyBillance(EnergyBillance billance) {
+        energyBillance = billance;
+        exportBtn.setEnabled(true);
+    }
 
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    private EnergyBillance energyBillance = null;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel balanceField;
     private javax.swing.JLabel basicPart;
@@ -711,6 +750,7 @@ public class Billance extends javax.swing.JFrame {
     private javax.swing.JTextField dueDate;
     private javax.swing.JCheckBox eletricityChck;
     private javax.swing.JTextField endDate;
+    private javax.swing.JButton exportBtn;
     private javax.swing.JComboBox<String> flatCmb;
     private javax.swing.JLabel flatCoef;
     private javax.swing.JLabel gasCons;
