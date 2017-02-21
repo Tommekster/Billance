@@ -65,6 +65,7 @@ public class TexExport implements BillanceExporter{
             writer.write(defCommand("totalCosts", cf.format(billance.getTotalCosts())));
             writer.write(defCommand("depositField", cf.format(billance.getDeposit())));
             writer.write(defCommand("balanceField", cf.format(billance.getBillance())));
+            writer.write(defCommand(billance.isOverpaid()?"overpaid":"notoverpaid", "1"));
             
             /*
             
