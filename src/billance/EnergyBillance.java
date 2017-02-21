@@ -260,7 +260,8 @@ public class EnergyBillance {
         }
         
         private final DateFormat dateFormat = new SimpleDateFormat(ResourceBundle.getBundle("billance/Services").getString("dateFormat"));
-        private final DecimalFormat floatFormat = new DecimalFormat("#.000");
+        private final DecimalFormat floatFormat = new DecimalFormat("0.000");
+        private final DecimalFormat floatShortFormat = new DecimalFormat("0.0");
         /*private Measures measures;
         
         public MeasuresTableModel(Measures measures){
@@ -314,7 +315,7 @@ public class EnergyBillance {
                     if(val instanceof Integer)
                         return Integer.toString((int) val);
                     if(val instanceof Float || val instanceof Double)
-                        return floatFormat.format(val);
+                        return (((val instanceof Float)?(float)val:(double)val) > 999)?floatShortFormat.format(val):floatFormat.format(val);
                     if(val instanceof String)
                         return (String) val;
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -470,7 +471,7 @@ public class EnergyBillance {
                     if(val instanceof Integer)
                         return Integer.toString((int) val);
                     if(val instanceof Float || val instanceof Double)
-                        return /*(999.0<=(float)val)?floatShortFormat.format(val):*/floatFormat.format(val);
+                        return (((val instanceof Float)?(float)val:(double)val) > 999)?floatShortFormat.format(val):floatFormat.format(val);
                     if(val instanceof String)
                         return (String) val;
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -571,6 +572,8 @@ public class EnergyBillance {
                 this.begin = begin;
                 this.end = end;
                 this.consumption = consumption;
+                this.cost = cost;
+                this.unitPrice = unitPrice;
             }
             String getItem(int index){
                 try {
