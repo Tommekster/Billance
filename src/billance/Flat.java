@@ -36,6 +36,10 @@ public class Flat {
         return commonSurface;
     }
     
+    public int getFlatId(){
+        return id;
+    }
+    
     private Flat() {}
 
     static Flat findFlat(int flatId) {

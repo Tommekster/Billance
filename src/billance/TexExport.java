@@ -11,11 +11,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.AbstractTableModel;
 
 /**
  *
@@ -39,30 +42,52 @@ public class TexExport implements BillanceExporter{
     public void export() {
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(file))){
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+            DecimalFormat ff = new DecimalFormat("0.000");
+            DecimalFormat sf = new DecimalFormat("#,##0.0");
+            DecimalFormat cf = new DecimalFormat("#,##0.00");
             writer.write(defCommand("doklad", preambule.docNumber));
             writer.write(defCommand("smlouva", preambule.contract));
-            writer.write(defCommand("byt", billance.getFlat().getID()));
+            writer.write(defCommand("byt", Integer.toString(billance.getFlat().getFlatId())));
             writer.write(defCommand("sod", df.format(billance.getBegin())));
             writer.write(defCommand("sdo", df.format(billance.getEnd())));
             writer.write(defCommand("komu", preambule.persons));
             writer.write(defCommand("dne", df.format(preambule.issue)));
             writer.write(defCommand("splatnost", df.format(preambule.due)));
+            writer.write(defCommand("combustionHeat", ff.format(billance.getTariff().getCombustionHeat())));
+            writer.write(defCommand("volumeCoef", ff.format(billance.getTariff().getVolumeCoeficient())));
+            writer.write(defCommand("flatCoef", ff.format(billance.getFlat().getFlatCoef())));
+            writer.write(defCommand("gasCons", sf.format(billance.getGasConsumption())));
+            writer.write(defCommand("heatCons", sf.format(billance.getMeasuredHeatConsumption())));
+            writer.write(defCommand("commonHeatCons", sf.format(billance.getCommonHeat())));
+            writer.write(defCommand("basicPart", sf.format(billance.getBasicHeatPart())));
+            writer.write(defCommand("consPart", sf.format(billance.getConsumptionHeatPart())));
+            writer.write(defCommand("heating", sf.format(billance.getHeatingEnergy())));
+            writer.write(defCommand("totalCosts", cf.format(billance.getTotalCosts())));
+            writer.write(defCommand("depositField", cf.format(billance.getDeposit())));
+            writer.write(defCommand("balanceField", cf.format(billance.getBillance())));
+            
             /*
-            \newcommand{\doklad}{17001}
-
-            \newcommand{\smlouva}{03/2015}
-            \newcommand{\byt}{4}
-            \newcommand{\sod}{01.11.2015}
-            \newcommand{\sdo}{31.10.2016}
-            \newcommand{\komu}{Dana Peko?ová, Filip Jiráska}
-            \newcommand{\dne}{19. listopadu 2016}
-            \newcommand{\splatnost}{19. prosince 2016}
+            
+        combustionHeat.setText(floatFormat.format(billance.getTariff().getCombustionHeat()));
+        volumeCoef.setText(floatFormat.format(billance.getTariff().getVolumeCoeficient()));
+        flatCoef.setText(floatFormat.format(billance.getFlat().getFlatCoef()));
+        gasCons.setText(floatShortFormat.format(billance.getGasConsumption())+" m3");
+        heatCons.setText(floatShortFormat.format(billance.getMeasuredHeatConsumption())+" kWh");
+        commonHeatCons.setText(floatShortFormat.format(billance.getCommonHeat())+" kWh");
+        basicPart.setText(floatShortFormat.format(billance.getBasicHeatPart())+" kWh");
+        consPart.setText(floatShortFormat.format(billance.getConsumptionHeatPart())+" kWh");
+        heating.setText(floatShortFormat.format(billance.getHeatingEnergy())+" kWh");
+        totalCosts.setText(currencyFormat.format(billance.getTotalCosts()));
+        depositField.setText(currencyFormat.format(billance.getDeposit()));
+        balanceField.setText(((billance.isOverpaid()?"+":""))+currencyFormat.format(billance.getBillance()));
             */
             
-            writer.write(defTableContent("servicesTable", billance.getServiceTableModel()));            
-            writer.write(defTableContent("heatingTable", billance.getHeatingTableModel()));
+            writer.write(defTableContent("servicesTable", billance.getServicesTableModel()));            
+            writer.write(defTableContent("heatingTable", billance.getHeatTableModel()));
             writer.write(defTableContent("summaryTable", billance.getSummaryTableModel()));
+            writer.write(defTableContent("exServiceTable", billance.getExtendedServicesTableModel()));
 
+            JOptionPane.showMessageDialog(null, "Vyúčtování bylo uloženo do souboru: \n"+file.getCanonicalPath(), "Soubor uložen", JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Soubor se nezdařilo uložit", "Chyba při ukládání", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(TexExport.class.getName()).log(Level.SEVERE, null, ex);
@@ -76,23 +101,23 @@ public class TexExport implements BillanceExporter{
         return sb.toString();
     }
     
-    public String defTableContent(String name, AbstractTable Model model) {
-        int cols = model.getColumnsCount();
-        int rows = model.getRowsCount();
+    public String defTableContent(String name, AbstractTableModel model) {
+        int cols = model.getColumnCount();
+        int rows = model.getRowCount();
         StringBuilder sb = new StringBuilder();
-        sb.append("\\newcommand{\\".append(name).append("}{\n");
+        sb.append("\\newcommand{\\").append(name).append("}{\n");
         for(int i = 0; i < rows; i++) {
             for(int j = 0; j < cols; j++) {
-                sb.append(model.getElementAt(i,j).toString());
+                sb.append(model.getValueAt(i,j).toString());
                 if(j == cols-1)
-                    sb.append(" \\\\ \\hline");
+                    sb.append(" \\\\ \\hline\n");
                 else
                     sb.append(" & ");
             }
         }
         sb.append("}\n");
         
-        return sb.toString();
+        return sb.toString().replaceAll("\\%", "\\\\\\%");
     }
         
     public static class DocumentPreambule{
