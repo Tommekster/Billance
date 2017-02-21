@@ -40,13 +40,13 @@ public class TexExport implements BillanceExporter{
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(file))){
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             writer.write(defCommand("doklad", preambule.docNumber));
-            writer.write(defCommand("smlouva", preambule.docNumber));
-            writer.write(defCommand("byt", preambule.docNumber));
-            writer.write(defCommand("sod", preambule.docNumber));
-            writer.write(defCommand("sdo", preambule.docNumber));
-            writer.write(defCommand("komu", preambule.docNumber));
-            writer.write(defCommand("dne", preambule.docNumber));
-            writer.write(defCommand("splatnost", preambule.docNumber));
+            writer.write(defCommand("smlouva", preambule.contract));
+            writer.write(defCommand("byt", billance.getFlat().getID()));
+            writer.write(defCommand("sod", df.format(billance.getBegin())));
+            writer.write(defCommand("sdo", df.format(billance.getEnd())));
+            writer.write(defCommand("komu", preambule.persons));
+            writer.write(defCommand("dne", df.format(preambule.issue)));
+            writer.write(defCommand("splatnost", df.format(preambule.due)));
             /*
             \newcommand{\doklad}{17001}
 
@@ -58,6 +58,11 @@ public class TexExport implements BillanceExporter{
             \newcommand{\dne}{19. listopadu 2016}
             \newcommand{\splatnost}{19. prosince 2016}
             */
+            
+            writer.write(defTableContent("servicesTable", billance.getServiceTableModel()));            
+            writer.write(defTableContent("heatingTable", billance.getHeatingTableModel()));
+            writer.write(defTableContent("summaryTable", billance.getSummaryTableModel()));
+
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Soubor se nezdařilo uložit", "Chyba při ukládání", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(TexExport.class.getName()).log(Level.SEVERE, null, ex);
@@ -68,6 +73,25 @@ public class TexExport implements BillanceExporter{
         StringBuilder sb = new StringBuilder();
         sb.append("\\newcommand{\\").append(name).append("}{").append(val).append("}\n");
 
+        return sb.toString();
+    }
+    
+    public String defTableContent(String name, AbstractTable Model model) {
+        int cols = model.getColumnsCount();
+        int rows = model.getRowsCount();
+        StringBuilder sb = new StringBuilder();
+        sb.append("\\newcommand{\\".append(name).append("}{\n");
+        for(int i = 0; i < rows; i++) {
+            for(int j = 0; j < cols; j++) {
+                sb.append(model.getElementAt(i,j).toString());
+                if(j == cols-1)
+                    sb.append(" \\\\ \\hline");
+                else
+                    sb.append(" & ");
+            }
+        }
+        sb.append("}\n");
+        
         return sb.toString();
     }
         
