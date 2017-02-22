@@ -19,8 +19,11 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 /**
  *
@@ -61,6 +64,9 @@ public class Billance extends javax.swing.JFrame {
         Calendar nextMonth = Calendar.getInstance();
         nextMonth.add(Calendar.MONTH,1);
         dueDate.setText(dateFormat.format(nextMonth.getTime()));
+        
+        jScrollPane4.setVisible(false);
+        jLabel12.setVisible(false);
     }
 
     /**
@@ -134,6 +140,10 @@ public class Billance extends javax.swing.JFrame {
         totalCosts = new javax.swing.JLabel();
         depositField = new javax.swing.JLabel();
         balanceField = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        nearestBeginDate = new javax.swing.JLabel();
+        jLabel30 = new javax.swing.JLabel();
+        nearestEndDate = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Billance");
@@ -448,10 +458,24 @@ public class Billance extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jLabel28.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel28.setText("odečet počátečních hodnot");
+
+        nearestBeginDate.setText("dd.MM.yyyy");
+
+        jLabel30.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel30.setText("odečet konečných hodnot");
+
+        nearestEndDate.setText("dd.MM.yyyy");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -496,19 +520,29 @@ public class Billance extends javax.swing.JFrame {
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(basicPart)
                                     .addComponent(heating)
-                                    .addComponent(consPart))))
+                                    .addComponent(consPart)))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel28)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(nearestBeginDate)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel30)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(nearestEndDate)))
                         .addGap(0, 2, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel10)
+                .addGap(4, 4, 4)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel28)
+                    .addComponent(nearestBeginDate)
+                    .addComponent(jLabel30)
+                    .addComponent(nearestEndDate))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -600,12 +634,29 @@ public class Billance extends javax.swing.JFrame {
     }
 
     private void displayEnergyBillance(EnergyBillance billance) {
-        measuredServicesTable.setModel(billance.getServicesTableModel());
+        // Services table
+        measuredServicesTable.setModel(billance.getExtendedServicesTableModel());
+        TableColumnModel columns = measuredServicesTable.getColumnModel();
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        columns.getColumn(1).setCellRenderer(centerRenderer);
+        columns.getColumn(2).setCellRenderer(centerRenderer);
+        columns.getColumn(3).setCellRenderer(centerRenderer);
+        columns.getColumn(4).setCellRenderer(centerRenderer);
+        
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+        columns.getColumn(5).setCellRenderer(rightRenderer);
+        columns.getColumn(6).setCellRenderer(rightRenderer);
+                
+        // Heating table
         heatconsumptionTable.setModel(billance.getHeatTableModel());
-        summaryTable.setModel(billance.getSummaryTableModel());
+        //summaryTable.setModel(billance.getSummaryTableModel());
         DecimalFormat floatFormat = new DecimalFormat("0.000");
         DecimalFormat floatShortFormat = new DecimalFormat("#,##0.0");
         DecimalFormat currencyFormat = new DecimalFormat("#,##0.00 Kč");
+        nearestBeginDate.setText(dateFormat.format(billance.nearestFrom));
+        nearestEndDate.setText(dateFormat.format(billance.nearestTo));
         combustionHeat.setText(floatFormat.format(billance.getTariff().getCombustionHeat()));
         volumeCoef.setText(floatFormat.format(billance.getTariff().getVolumeCoeficient()));
         flatCoef.setText(floatFormat.format(billance.getFlat().getFlatCoef()));
@@ -777,7 +828,9 @@ public class Billance extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -792,6 +845,8 @@ public class Billance extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTable measuredServicesTable;
+    private javax.swing.JLabel nearestBeginDate;
+    private javax.swing.JLabel nearestEndDate;
     private javax.swing.JTextField personText;
     private javax.swing.JTable summaryTable;
     private javax.swing.JComboBox<String> tarifCmb;

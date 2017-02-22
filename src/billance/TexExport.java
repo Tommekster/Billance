@@ -53,6 +53,8 @@ public class TexExport implements BillanceExporter{
             writer.write(defCommand("komu", preambule.persons));
             writer.write(defCommand("dne", df.format(preambule.issue)));
             writer.write(defCommand("splatnost", df.format(preambule.due)));
+            writer.write(defCommand("mesBegin", df.format(billance.nearestFrom)));
+            writer.write(defCommand("mesEnd", df.format(billance.nearestTo)));
             writer.write(defCommand("combustionHeat", ff.format(billance.getTariff().getCombustionHeat())));
             writer.write(defCommand("volumeCoef", ff.format(billance.getTariff().getVolumeCoeficient())));
             writer.write(defCommand("flatCoef", ff.format(billance.getFlat().getFlatCoef())));
@@ -66,6 +68,7 @@ public class TexExport implements BillanceExporter{
             writer.write(defCommand("depositField", cf.format(billance.getDeposit())));
             writer.write(defCommand("balanceField", cf.format(billance.getBillance())));
             writer.write(defCommand(billance.isOverpaid()?"overpaid":"notoverpaid", "1"));
+            writer.write(defCommand(billance.isOverpaid()?"preplatek":"nedoplatek", cf.format(Math.abs(billance.getBillance()))));
             
             /*
             

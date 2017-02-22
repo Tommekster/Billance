@@ -484,8 +484,6 @@ public class EnergyBillance {
     
     public class ExtendedServicesTableModel extends AbstractTableModel{
         private final String[] columnNames = {ResourceBundle.getBundle("billance/Services").getString("serviceName"),
-            ResourceBundle.getBundle("billance/Services").getString("serviceFrom"),
-            ResourceBundle.getBundle("billance/Services").getString("serviceTo"),
             ResourceBundle.getBundle("billance/Services").getString("serviceUnit"),
             ResourceBundle.getBundle("billance/Services").getString("serviceBegin"),
             ResourceBundle.getBundle("billance/Services").getString("serviceEnd"),
@@ -496,36 +494,32 @@ public class EnergyBillance {
         List<ExtendedServiceRow> rows = new LinkedList<>();
         {
             rows.add(new ExtendedServiceRow(ResourceBundle.getBundle("billance/Services").getString("water"),
-                nearestFrom,nearestTo,
                 ResourceBundle.getBundle("billance/Services").getString("waterUnit"),
                 waterBeg,waterEnd,water,
                 tariff.water*water,tariff.water));
             if(includeEletricity){
                 rows.add(new ExtendedServiceRow(ResourceBundle.getBundle("billance/Services").getString("electricityVT"),
-                    nearestFrom,nearestTo,
                     ResourceBundle.getBundle("billance/Services").getString("electricityVTUnit"),
                     vtBeg,vtEnd,vt,
                     tariff.elvt*vt,tariff.elvt));
                 rows.add(new ExtendedServiceRow(ResourceBundle.getBundle("billance/Services").getString("electricityNT"),
-                    nearestFrom,nearestTo,
                     ResourceBundle.getBundle("billance/Services").getString("electricityNTUnit"),
                     ntBeg,ntEnd,nt,
                     tariff.elnt*nt,tariff.elnt));
             }
             rows.add(new ExtendedServiceRow(ResourceBundle.getBundle("billance/Services").getString("heat"),
-                nearestFrom,nearestTo,
                 ResourceBundle.getBundle("billance/Services").getString("heatUnit"),
                 "","",getHeatingEnergy(),
                 tariff.heat*getHeatingEnergy(),tariff.heat));
             rows.add(new ExtendedServiceRow(ResourceBundle.getBundle("billance/Services").getString("monthlyFee"),
-                periodFrom,periodTo,
                 ResourceBundle.getBundle("billance/Services").getString("monthlyFeeUnit"),
                 periodFrom,periodTo,months,
                 tariff.getMonthFee(includeEletricity)*months,tariff.getMonthFee(includeEletricity)));
         }
         
         private final DateFormat dateFormat = new SimpleDateFormat(ResourceBundle.getBundle("billance/Services").getString("dateFormat"));
-        private final DecimalFormat floatFormat = new DecimalFormat("#.000");
+        private final DecimalFormat floatFormat = new DecimalFormat("0.000");
+        private final DecimalFormat floatShortFormat = new DecimalFormat("0.0");
         private final DecimalFormat currencyFormat = new DecimalFormat("#,##0.00 Kč");
         /*private Measures measures;
         
@@ -556,18 +550,14 @@ public class EnergyBillance {
         
         class ExtendedServiceRow{
             public String name;
-            public Date from;
-            public Date to;
             public String unit;
             public Object begin;
             public Object end;
             public Object consumption;
             public double cost;
             public double unitPrice;
-            public ExtendedServiceRow(String name,Date from,Date to,String unit,Object begin,Object end,Object consumption, double cost, double unitPrice){
+            public ExtendedServiceRow(String name,String unit,Object begin,Object end,Object consumption, double cost, double unitPrice){
                 this.name = name;
-                this.from = from;
-                this.to = to;
                 this.unit = unit;
                 this.begin = begin;
                 this.end = end;
@@ -586,7 +576,7 @@ public class EnergyBillance {
                     if(val instanceof Integer)
                         return Integer.toString((int) val);
                     if(val instanceof Float || val instanceof Double)
-                        return floatFormat.format(val);
+                        return (((val instanceof Float)?(float)val:(double)val) > 999)?floatShortFormat.format(val):floatFormat.format(val);
                     if(val instanceof String)
                         return (String) val;
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
