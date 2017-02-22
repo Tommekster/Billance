@@ -7,8 +7,10 @@ package billance;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -40,7 +42,8 @@ public class TexExport implements BillanceExporter{
 
     @Override
     public void export() {
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(file))){
+        //try(BufferedWriter writer = new BufferedWriter(new FileWriter(file))){
+        try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))){
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             DecimalFormat ff = new DecimalFormat("0.000");
             DecimalFormat sf = new DecimalFormat("#,##0.0");
