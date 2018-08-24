@@ -15,7 +15,8 @@
  */
 package billance;
 
-import billance.dataProvider.Database;
+import billance.dataProvider.DataProviderManager;
+import billance.dataProvider.DateFormatProvider;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,34 +38,6 @@ import javax.swing.table.AbstractTableModel;
  */
 public class EnergyBillance
 {
-
-    Tariff tariff;
-    Date periodFrom;
-    Date periodTo;
-    Flat flat;
-    Date nearestFrom;
-    Date nearestTo;
-    int waterBeg;
-    int waterEnd;
-    int water;
-    int vtBeg;
-    int vtEnd;
-    int vt;
-    int ntBeg;
-    int ntEnd;
-    int nt;
-    boolean includeEletricity;
-    int deposit;
-    List<HeatConsumptionRow> heating;
-    int days;
-    float months;
-    double gasFlat;
-    int gasCommon;
-
-    private EnergyBillance()
-    {
-    }
-
     public static EnergyBillance loadMeasures(Date from, Date to, Flat flat, Tariff tariff, boolean eletricity, int deposit)
     {
         EnergyBillance m = new EnergyBillance();
@@ -96,61 +69,33 @@ public class EnergyBillance
         return m;
     }
 
-    private void findNearestDates()
+    Tariff tariff;
+    Date periodFrom;
+    Date periodTo;
+    Flat flat;
+    Date nearestFrom;
+    Date nearestTo;
+    int waterBeg;
+    int waterEnd;
+    int water;
+    int vtBeg;
+    int vtEnd;
+    int vt;
+    int ntBeg;
+    int ntEnd;
+    int nt;
+    boolean includeEletricity;
+    int deposit;
+    List<HeatConsumptionRow> heating;
+    int days;
+    float months;
+    double gasFlat;
+    int gasCommon;
+
+    private EnergyBillance()
     {
-        nearestFrom = Database.getInstance().findNearestMeasureDate(periodFrom);
-        nearestTo = Database.getInstance().findNearestMeasureDate(periodTo);
     }
 
-    private void loadValues() throws SQLException
-    {
-        ResultSet result = Database.getInstance().findMeasure(nearestFrom);
-        result.next();
-        waterBeg = result.getInt(flat.getWM());
-        vtBeg = result.getInt(flat.getVT());
-        ntBeg = result.getInt(flat.getNT());
-
-        result = Database.getInstance().findMeasure(nearestTo);
-        result.next();
-        waterEnd = result.getInt(flat.getWM());
-        vtEnd = result.getInt(flat.getVT());
-        ntEnd = result.getInt(flat.getNT());
-    }
-
-    private void loadHeatConsumption() throws SQLException, ParseException
-    {
-        ResultSet result = Database.getInstance().findHeatConsumption(nearestFrom, nearestTo);
-        heating = new LinkedList<>();
-        DateFormat df = Database.getDateFormat();
-        gasFlat = 0;
-        gasCommon = 0;
-        while (result.next())
-        {
-            HeatConsumptionRow hcr = new HeatConsumptionRow();
-            hcr.from = df.parse(result.getString("from"));
-            hcr.to = df.parse(result.getString("to"));
-            hcr.gas = result.getInt("gas");
-            hcr.tm_sum = result.getInt("sum");
-            hcr.tm = result.getInt(flat.getTM());
-            hcr.countFraction();
-            heating.add(hcr);
-
-            gasFlat += hcr.gasFraction;
-            gasCommon += hcr.gas;
-        }
-    }
-
-    private double getGasEnergy(double volumeGas)
-    {
-        return volumeGas * tariff.getVolumeCoeficient() * tariff.getCombustionHeat();
-    }
-
-    private void countConsumption()
-    {
-        water = waterEnd - waterBeg;
-        vt = vtEnd - vtBeg;
-        nt = ntEnd - ntBeg;
-    }
 
     public double getGasConsumption()
     {
@@ -202,15 +147,6 @@ public class EnergyBillance
         return new ExtendedServicesTableModel();
     }
 
-    Tariff getTariff()
-    {
-        return tariff;
-    }
-
-    Flat getFlat()
-    {
-        return flat;
-    }
 
     public Date getBegin()
     {
@@ -245,6 +181,65 @@ public class EnergyBillance
     public boolean isOverpaid()
     {
         return getBillance() > 0;
+    }
+    private void findNearestDates()
+    {
+        nearestFrom = DataProviderManager.getDataProviderInstance().findNearestMeasureDate(periodFrom);
+        nearestTo = DataProviderManager.getDataProviderInstance().findNearestMeasureDate(periodTo);
+    }
+    private void loadValues() throws SQLException
+    {
+        ResultSet result = DataProviderManager.getDataProviderInstance().findMeasure(nearestFrom);
+        result.next();
+        waterBeg = result.getInt(flat.getWM());
+        vtBeg = result.getInt(flat.getVT());
+        ntBeg = result.getInt(flat.getNT());
+        
+        result = DataProviderManager.getDataProviderInstance().findMeasure(nearestTo);
+        result.next();
+        waterEnd = result.getInt(flat.getWM());
+        vtEnd = result.getInt(flat.getVT());
+        ntEnd = result.getInt(flat.getNT());
+    }
+    private void loadHeatConsumption() throws SQLException, ParseException
+    {
+        ResultSet result = DataProviderManager.getDataProviderInstance().findHeatConsumption(nearestFrom, nearestTo);
+        heating = new LinkedList<>();
+        DateFormat df = DateFormatProvider.getDateFormat();
+        gasFlat = 0;
+        gasCommon = 0;
+        while (result.next())
+        {
+            HeatConsumptionRow hcr = new HeatConsumptionRow();
+            hcr.from = df.parse(result.getString("from"));
+            hcr.to = df.parse(result.getString("to"));
+            hcr.gas = result.getInt("gas");
+            hcr.tm_sum = result.getInt("sum");
+            hcr.tm = result.getInt(flat.getTM());
+            hcr.countFraction();
+            heating.add(hcr);
+            
+            gasFlat += hcr.gasFraction;
+            gasCommon += hcr.gas;
+        }
+    }
+    private double getGasEnergy(double volumeGas)
+    {
+        return volumeGas * tariff.getVolumeCoeficient() * tariff.getCombustionHeat();
+    }
+    private void countConsumption()
+    {
+        water = waterEnd - waterBeg;
+        vt = vtEnd - vtBeg;
+        nt = ntEnd - ntBeg;
+    }
+    Tariff getTariff()
+    {
+        return tariff;
+    }
+    Flat getFlat()
+    {
+        return flat;
     }
 
     static class HeatConsumptionRow

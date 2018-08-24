@@ -5,7 +5,7 @@
  */
 package billance;
 
-import billance.dataProvider.Database;
+import billance.dataProvider.DataProviderManager;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,14 +32,14 @@ public class Flat
         String [] flatNames = new String [flats.length];
         for(int i = 0; i < flats.length; i++) flatNames[i] = Integer.toString(flats[i].intValue());
         return flatNames;*/
-        return Database.getInstance().getFlats();
+        return DataProviderManager.getDataProviderInstance().getFlats();
     }
 
     public static int getCommonSurface()
     {
         if (commonSurface == 0)
         {
-            commonSurface = Database.getInstance().getFlatsSurface();
+            commonSurface = DataProviderManager.getDataProviderInstance().getFlatsSurface();
         }
         return commonSurface;
     }
@@ -57,7 +57,7 @@ public class Flat
     {
         try
         {
-            ResultSet rs = Database.getInstance().findFlat(flatId);
+            ResultSet rs = DataProviderManager.getDataProviderInstance().findFlat(flatId);
             if (!rs.next())
             {
                 return null;

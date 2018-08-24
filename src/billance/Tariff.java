@@ -5,7 +5,7 @@
  */
 package billance;
 
-import billance.dataProvider.Database;
+import billance.dataProvider.DataProviderManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -35,7 +35,7 @@ public class Tariff
 
     public static Date[] getTarrifs() throws ClassNotFoundException, SQLException, ParseException
     {
-        return Database.getInstance().getTarrifs();
+        return DataProviderManager.getDataProviderInstance().getTarrifs();
     }
 
     private Tariff()
@@ -46,7 +46,7 @@ public class Tariff
     {
         try
         {
-            ResultSet rs = Database.getInstance().findTariff(validFrom);
+            ResultSet rs = DataProviderManager.getDataProviderInstance().findTariff(validFrom);
             if (!rs.next())
             {
                 return null;

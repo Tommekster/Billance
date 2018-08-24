@@ -5,7 +5,8 @@
  */
 package billance;
 
-import billance.dataProvider.Database;
+import billance.dataProvider.DataProviderManager;
+import billance.dataProvider.DateFormatProvider;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,27 +22,15 @@ import java.util.logging.Logger;
 public class Contract
 {
 
-    private String code;
-    public Date from;
-    public Date to;
-    public int flat;
-    public boolean eletricity;
-    public boolean archived;
-
     public static String[] getContracts() throws ClassNotFoundException, SQLException
     {
-        return Database.getInstance().getContracts();
+        return DataProviderManager.getDataProviderInstance().getContracts();
     }
-
-    private Contract()
-    {
-    }
-
-    static Contract findContract(String code)
+    static Contract findContract(String code) throws ParseException
     {
         try
         {
-            ResultSet rs = Database.getInstance().findContract(code);
+            ResultSet rs = DataProviderManager.getDataProviderInstance().findContract(code);
             if (!rs.next())
             {
                 return null;
@@ -53,7 +42,7 @@ public class Contract
             {
                 if (Date.class.equals(field.getType()))
                 {
-                    field.set(c, Database.getDate(rs, field.getName()));
+                    field.set(c, DateFormatProvider.getDate(rs, field.getName()));
                 }
                 else if (int.class.equals(field.getType()))
                 {
@@ -66,15 +55,27 @@ public class Contract
             }
             return c;
         }
-        catch (SQLException | IllegalArgumentException | IllegalAccessException | ParseException ex)
+        catch (SQLException | IllegalArgumentException | IllegalAccessException ex)
         {
             Logger.getLogger(Contract.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
+    public Date from;
+    public Date to;
+    public int flat;
+    public boolean eletricity;
+    public boolean archived;
+
+    private String code;
+
+    private Contract()
+    {
+    }
+
 
     public String getPersons()
     {
-        return Database.getInstance().getContractPersons(code);
+        return DataProviderManager.getDataProviderInstance().getContractPersons(code);
     }
 }
