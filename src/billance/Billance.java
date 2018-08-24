@@ -5,6 +5,8 @@
  */
 package billance;
 
+import billance.tools.EnergyBillanceCalculator;
+import billance.tools.ToolsProvider;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.HeadlessException;
@@ -627,10 +629,12 @@ public class Billance extends javax.swing.JFrame
             Date from = getDateValue(beginDate);
             Date to = getDateValue(endDate);
             int deposit = getIntValue(depositText);
+            boolean isEletricity = eletricityChck.isSelected();
             Flat flat = Flat.findFlat(Integer.parseInt((String) flatCmb.getSelectedItem()));
             Tariff tariff = Tariff.findTariff(dateFormat.parse((String) tarifCmb.getSelectedItem()));
 
-            EnergyBillance billance = EnergyBillance.loadMeasures(from, to, flat, tariff, eletricityChck.isSelected(), deposit);
+            EnergyBillanceCalculator calculator = ToolsProvider.getTool(EnergyBillanceCalculator.class);
+            EnergyBillance billance = calculator.calculateBillance(from, to, flat, tariff, isEletricity, deposit);
             displayEnergyBillance(billance);
             setEnergyBillance(billance);
         }
@@ -685,12 +689,20 @@ public class Billance extends javax.swing.JFrame
     }
 
     private void contractCmbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contractCmbActionPerformed
-        if (evt.getSource() != contractCmb || contractCmb.getSelectedItem() == null)
+        try
         {
-            return;
+            if (evt.getSource() != contractCmb || contractCmb.getSelectedItem() == null)
+            {
+                return;
+            }
+            Contract contract = Contract.findContract((String) contractCmb.getSelectedItem());
+            loadValuesFromContract(contract);
         }
-        Contract contract = Contract.findContract((String) contractCmb.getSelectedItem());
-        loadValuesFromContract(contract);
+        catch (ParseException ex)
+        {
+            JOptionPane.showMessageDialog(this,"Error: Some field has wrong format!");
+            Logger.getLogger(Billance.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_contractCmbActionPerformed
 
     private void exportBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportBtnActionPerformed
@@ -775,6 +787,7 @@ public class Billance extends javax.swing.JFrame
             {
                 new Billance().setVisible(true);
             }
+
         });
     }
 
