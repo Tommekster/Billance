@@ -29,22 +29,28 @@ import javax.swing.table.TableColumnModel;
  *
  * @author Acer
  */
-public class Billance extends javax.swing.JFrame {
+public class Billance extends javax.swing.JFrame
+{
 
     /**
      * Creates new form Billance
      */
-    public Billance() {
+    public Billance()
+    {
         initComponents();
-        
-        try{
+
+        try
+        {
             initDefaultValues();
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(this, "Unexpected exception\n"+e.getMessage(), "Title", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (Exception e)
+        {
+            JOptionPane.showMessageDialog(this, "Unexpected exception\n" + e.getMessage(), "Title", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void initDefaultValues() throws ClassNotFoundException, SQLException, ParseException {
+    private void initDefaultValues() throws ClassNotFoundException, SQLException, ParseException
+    {
         // load list of tarrifs
         tarifCmb.setModel(new DefaultComboBoxModel<>(dateList2Strings(Tariff.getTarrifs())));
         tarifCmb.setSelectedIndex(-1);
@@ -62,9 +68,9 @@ public class Billance extends javax.swing.JFrame {
         endDate.setText(dateFormat.format(currentDate));
         issueDate.setText(dateFormat.format(currentDate));
         Calendar nextMonth = Calendar.getInstance();
-        nextMonth.add(Calendar.MONTH,1);
+        nextMonth.add(Calendar.MONTH, 1);
         dueDate.setText(dateFormat.format(nextMonth.getTime()));
-        
+
         jScrollPane4.setVisible(false);
         jLabel12.setVisible(false);
     }
@@ -611,29 +617,36 @@ public class Billance extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
-        try {
+        try
+        {
             // check values
-            if(flatCmb.getSelectedItem() == null || tarifCmb.getSelectedItem() == null)
+            if (flatCmb.getSelectedItem() == null || tarifCmb.getSelectedItem() == null)
+            {
                 throw new ParseException("ComboBox", 0);
+            }
             Date from = getDateValue(beginDate);
             Date to = getDateValue(endDate);
             int deposit = getIntValue(depositText);
             Flat flat = Flat.findFlat(Integer.parseInt((String) flatCmb.getSelectedItem()));
             Tariff tariff = Tariff.findTariff(dateFormat.parse((String) tarifCmb.getSelectedItem()));
-            
+
             EnergyBillance billance = EnergyBillance.loadMeasures(from, to, flat, tariff, eletricityChck.isSelected(), deposit);
             displayEnergyBillance(billance);
             setEnergyBillance(billance);
-        } catch (NumberFormatException | ParseException ex) {
+        }
+        catch (NumberFormatException | ParseException ex)
+        {
             incorrectFields();
         }
     }//GEN-LAST:event_continueButtonActionPerformed
 
-    private void incorrectFields() throws HeadlessException {
+    private void incorrectFields() throws HeadlessException
+    {
         JOptionPane.showMessageDialog(this, "Some fields has incorrect values. ", "Incorrect fields", JOptionPane.ERROR_MESSAGE);
     }
 
-    private void displayEnergyBillance(EnergyBillance billance) {
+    private void displayEnergyBillance(EnergyBillance billance)
+    {
         // Services table
         measuredServicesTable.setModel(billance.getExtendedServicesTableModel());
         TableColumnModel columns = measuredServicesTable.getColumnModel();
@@ -643,12 +656,12 @@ public class Billance extends javax.swing.JFrame {
         columns.getColumn(2).setCellRenderer(centerRenderer);
         columns.getColumn(3).setCellRenderer(centerRenderer);
         columns.getColumn(4).setCellRenderer(centerRenderer);
-        
+
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
         rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
         columns.getColumn(5).setCellRenderer(rightRenderer);
         columns.getColumn(6).setCellRenderer(rightRenderer);
-                
+
         // Heating table
         heatconsumptionTable.setModel(billance.getHeatTableModel());
         //summaryTable.setModel(billance.getSummaryTableModel());
@@ -660,25 +673,29 @@ public class Billance extends javax.swing.JFrame {
         combustionHeat.setText(floatFormat.format(billance.getTariff().getCombustionHeat()));
         volumeCoef.setText(floatFormat.format(billance.getTariff().getVolumeCoeficient()));
         flatCoef.setText(floatFormat.format(billance.getFlat().getFlatCoef()));
-        gasCons.setText(floatShortFormat.format(billance.getGasConsumption())+" m3");
-        heatCons.setText(floatShortFormat.format(billance.getMeasuredHeatConsumption())+" kWh");
-        commonHeatCons.setText(floatShortFormat.format(billance.getCommonHeat())+" kWh");
-        basicPart.setText(floatShortFormat.format(billance.getBasicHeatPart())+" kWh");
-        consPart.setText(floatShortFormat.format(billance.getConsumptionHeatPart())+" kWh");
-        heating.setText(floatShortFormat.format(billance.getHeatingEnergy())+" kWh");
+        gasCons.setText(floatShortFormat.format(billance.getGasConsumption()) + " m3");
+        heatCons.setText(floatShortFormat.format(billance.getMeasuredHeatConsumption()) + " kWh");
+        commonHeatCons.setText(floatShortFormat.format(billance.getCommonHeat()) + " kWh");
+        basicPart.setText(floatShortFormat.format(billance.getBasicHeatPart()) + " kWh");
+        consPart.setText(floatShortFormat.format(billance.getConsumptionHeatPart()) + " kWh");
+        heating.setText(floatShortFormat.format(billance.getHeatingEnergy()) + " kWh");
         totalCosts.setText(currencyFormat.format(billance.getTotalCosts()));
         depositField.setText(currencyFormat.format(billance.getDeposit()));
-        balanceField.setText(((billance.isOverpaid()?"+":""))+currencyFormat.format(billance.getBillance()));
+        balanceField.setText(((billance.isOverpaid() ? "+" : "")) + currencyFormat.format(billance.getBillance()));
     }
 
     private void contractCmbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contractCmbActionPerformed
-        if(evt.getSource() != contractCmb || contractCmb.getSelectedItem() == null) return;
-        Contract contract = Contract.findContract((String)contractCmb.getSelectedItem());
+        if (evt.getSource() != contractCmb || contractCmb.getSelectedItem() == null)
+        {
+            return;
+        }
+        Contract contract = Contract.findContract((String) contractCmb.getSelectedItem());
         loadValuesFromContract(contract);
     }//GEN-LAST:event_contractCmbActionPerformed
 
     private void exportBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportBtnActionPerformed
-        try {
+        try
+        {
             TexExport.DocumentPreambule preambule = new TexExport.DocumentPreambule(
                     documentText.getText(),
                     contractCmb.getSelectedItem().toString(),
@@ -686,16 +703,21 @@ public class Billance extends javax.swing.JFrame {
                     getDateValue(issueDate), getDateValue(dueDate));
             BillanceExporter be = new TexExport(energyBillance, preambule);
             be.export();
-        } catch (ParseException ex) {
+        }
+        catch (ParseException ex)
+        {
             incorrectFields();
         }
     }//GEN-LAST:event_exportBtnActionPerformed
 
-    private void loadValuesFromContract(Contract contract) {
+    private void loadValuesFromContract(Contract contract)
+    {
         eletricityChck.setSelected(contract.eletricity);
         String flatId = Integer.toString(contract.flat);
-        for(int i = 0; i < flatCmb.getItemCount(); i++){
-            if(flatCmb.getItemAt(i).equals(flatId)) {
+        for (int i = 0; i < flatCmb.getItemCount(); i++)
+        {
+            if (flatCmb.getItemAt(i).equals(flatId))
+            {
                 flatCmb.setSelectedIndex(i);
                 break;
             }
@@ -708,77 +730,106 @@ public class Billance extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[])
+    {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Windows".equals(info.getName())) {
+        try
+        {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+            {
+                if ("Windows".equals(info.getName()))
+                {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
+        }
+        catch (ClassNotFoundException ex)
+        {
             java.util.logging.Logger.getLogger(Billance.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
+        }
+        catch (InstantiationException ex)
+        {
             java.util.logging.Logger.getLogger(Billance.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
+        }
+        catch (IllegalAccessException ex)
+        {
             java.util.logging.Logger.getLogger(Billance.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        }
+        catch (javax.swing.UnsupportedLookAndFeelException ex)
+        {
             java.util.logging.Logger.getLogger(Billance.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         Locale.setDefault(new Locale("cs"));
-                
+
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
+        java.awt.EventQueue.invokeLater(new Runnable()
+        {
+            public void run()
+            {
                 new Billance().setVisible(true);
             }
         });
     }
 
-    private String[] dateList2Strings(Date [] dl){
-        String [] strings = new String[dl.length];
-        for(int i = 0; i < dl.length; i++)
+    private String[] dateList2Strings(Date[] dl)
+    {
+        String[] strings = new String[dl.length];
+        for (int i = 0; i < dl.length; i++)
+        {
             strings[i] = dateFormat.format(dl[i]);
+        }
         return strings;
     }
 
-    private Date getDateValue(JTextField textField) throws ParseException {
-        try {
+    private Date getDateValue(JTextField textField) throws ParseException
+    {
+        try
+        {
             Date date = dateFormat.parse(textField.getText());
             correctComponent(textField);
             return date;
-        } catch (ParseException ex) {
+        }
+        catch (ParseException ex)
+        {
             incorrectComponent(textField);
             throw ex;
         }
     }
-    private int getIntValue(JTextField textField) throws NumberFormatException {
-        try {
+
+    private int getIntValue(JTextField textField) throws NumberFormatException
+    {
+        try
+        {
             int number = Integer.decode(textField.getText());
             correctComponent(textField);
             return number;
-        } catch (NumberFormatException ex) {
+        }
+        catch (NumberFormatException ex)
+        {
             incorrectComponent(textField);
             throw ex;
         }
     }
-    
-    private void correctComponent(Component component) {
+
+    private void correctComponent(Component component)
+    {
         component.setBackground(Color.white);
     }
 
-    private void incorrectComponent(Component component) {
+    private void incorrectComponent(Component component)
+    {
         component.setBackground(Color.pink);
     }
-    
-    private void setEnergyBillance(EnergyBillance billance) {
+
+    private void setEnergyBillance(EnergyBillance billance)
+    {
         energyBillance = billance;
         exportBtn.setEnabled(true);
     }

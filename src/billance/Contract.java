@@ -18,43 +18,63 @@ import java.util.logging.Logger;
  *
  * @author Acer
  */
-public class Contract {
+public class Contract
+{
+
     private String code;
     public Date from;
     public Date to;
     public int flat;
     public boolean eletricity;
     public boolean archived;
-    
-    public static String [] getContracts() throws ClassNotFoundException, SQLException{
+
+    public static String[] getContracts() throws ClassNotFoundException, SQLException
+    {
         return Database.getInstance().getContracts();
     }
-    
-    private Contract() {}
 
-    static Contract findContract(String code) {
-        try {
+    private Contract()
+    {
+    }
+
+    static Contract findContract(String code)
+    {
+        try
+        {
             ResultSet rs = Database.getInstance().findContract(code);
-            if(!rs.next()) return null;
+            if (!rs.next())
+            {
+                return null;
+            }
             Contract c = new Contract();
             c.code = code;
-            Field [] fields = c.getClass().getFields();
-            for(Field field : fields){
-                if(Date.class.equals(field.getType())){
+            Field[] fields = c.getClass().getFields();
+            for (Field field : fields)
+            {
+                if (Date.class.equals(field.getType()))
+                {
                     field.set(c, Database.getDate(rs, field.getName()));
-                }else if(int.class.equals(field.getType()))
+                }
+                else if (int.class.equals(field.getType()))
+                {
                     field.set(c, rs.getInt(field.getName()));
-                else if(boolean.class.equals(field.getType()))
+                }
+                else if (boolean.class.equals(field.getType()))
+                {
                     field.set(c, rs.getBoolean(field.getName()));
+                }
             }
             return c;
-        } catch (SQLException | IllegalArgumentException | IllegalAccessException | ParseException ex) {
+        }
+        catch (SQLException | IllegalArgumentException | IllegalAccessException | ParseException ex)
+        {
             Logger.getLogger(Contract.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
-    
-    public String getPersons(){
+
+    public String getPersons()
+    {
         return Database.getInstance().getContractPersons(code);
     }
 }

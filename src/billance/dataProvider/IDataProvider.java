@@ -24,19 +24,19 @@ public interface IDataProvider
     Date findNearestMeasureDate(Date date);
 
     String[] getContracts() throws ClassNotFoundException, SQLException;
-    
+
     ResultSet findContract(String code) throws SQLException;
-    
+
     String getContractPersons(String code);
 
     String[] getFlats() throws ClassNotFoundException, SQLException;
-    
+
     ResultSet findFlat(int flatId) throws SQLException;
-    
+
     int getFlatsSurface();
 
     Date[] getTarrifs() throws ClassNotFoundException, SQLException, ParseException;
-    
+
     ResultSet findTariff(Date validFrom) throws SQLException;
-    
+
 }
