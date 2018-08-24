@@ -159,6 +159,12 @@ public class Billance extends javax.swing.JFrame
         nearestBeginDate = new javax.swing.JLabel();
         jLabel30 = new javax.swing.JLabel();
         nearestEndDate = new javax.swing.JLabel();
+        mainMenu = new javax.swing.JMenuBar();
+        billanceMenu = new javax.swing.JMenu();
+        previewMenuItem = new javax.swing.JMenuItem();
+        exportMenuItem = new javax.swing.JMenuItem();
+        remoteMenu = new javax.swing.JMenu();
+        importMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Billance");
@@ -611,6 +617,26 @@ public class Billance extends javax.swing.JFrame
 
         jScrollPane1.setViewportView(jPanel2);
 
+        billanceMenu.setText("Billance");
+
+        previewMenuItem.setText("Preview");
+        billanceMenu.add(previewMenuItem);
+
+        exportMenuItem.setText("Export");
+        exportMenuItem.setEnabled(false);
+        billanceMenu.add(exportMenuItem);
+
+        mainMenu.add(billanceMenu);
+
+        remoteMenu.setText("Remote");
+
+        importMenuItem.setText("Import Contracts");
+        remoteMenu.add(importMenuItem);
+
+        mainMenu.add(remoteMenu);
+
+        setJMenuBar(mainMenu);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -629,7 +655,7 @@ public class Billance extends javax.swing.JFrame
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 193, Short.MAX_VALUE))
+                        .addGap(0, 172, Short.MAX_VALUE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -873,6 +899,7 @@ public class Billance extends javax.swing.JFrame
     private javax.swing.JLabel balanceField;
     private javax.swing.JLabel basicPart;
     private javax.swing.JTextField beginDate;
+    private javax.swing.JMenu billanceMenu;
     private javax.swing.JLabel combustionHeat;
     private javax.swing.JLabel commonHeatCons;
     private javax.swing.JLabel consPart;
@@ -885,12 +912,14 @@ public class Billance extends javax.swing.JFrame
     private javax.swing.JCheckBox eletricityChck;
     private javax.swing.JTextField endDate;
     private javax.swing.JButton exportBtn;
+    private javax.swing.JMenuItem exportMenuItem;
     private javax.swing.JComboBox<String> flatCmb;
     private javax.swing.JLabel flatCoef;
     private javax.swing.JLabel gasCons;
     private javax.swing.JLabel heatCons;
     private javax.swing.JTable heatconsumptionTable;
     private javax.swing.JLabel heating;
+    private javax.swing.JMenuItem importMenuItem;
     private javax.swing.JTextField issueDate;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -928,10 +957,13 @@ public class Billance extends javax.swing.JFrame
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JMenuBar mainMenu;
     private javax.swing.JTable measuredServicesTable;
     private javax.swing.JLabel nearestBeginDate;
     private javax.swing.JLabel nearestEndDate;
     private javax.swing.JTextField personText;
+    private javax.swing.JMenuItem previewMenuItem;
+    private javax.swing.JMenu remoteMenu;
     private javax.swing.JTable summaryTable;
     private javax.swing.JComboBox<TariffSelectionView> tarifCmb;
     private javax.swing.JLabel totalCosts;
