@@ -15,6 +15,7 @@
  */
 package billance;
 
+import billance.dataProvider.Database;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;

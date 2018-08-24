@@ -5,6 +5,7 @@
  */
 package billance;
 
+import billance.dataProvider.Database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;

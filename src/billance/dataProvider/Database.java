@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package billance;
+package billance.dataProvider;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  *
  * @author Acer
  */
-public class Database {
+public class Database implements IDataProvider {
     private Connection con;
     private boolean hasData = false;
     private static Database database = null;
@@ -32,7 +32,7 @@ public class Database {
     
     private Database(){}
     
-    public static Database getInstance(){
+    public static IDataProvider getInstance(){
         if(database == null) database = new Database();
         return database;
     }
@@ -206,6 +206,7 @@ public class Database {
         return dateFormat.parse(rs.getString(field));
     }
     
+    @Override
     public Date [] getTarrifs() throws ClassNotFoundException, SQLException, ParseException{
         if(con == null) getConnection();
         Statement state = con.createStatement();
@@ -217,6 +218,7 @@ public class Database {
         return tarrifs.toArray(new Date [0]);
     }
     
+    @Override
     public String [] getContracts() throws ClassNotFoundException, SQLException{
         if(con == null) getConnection();
         Statement state = con.createStatement();
@@ -228,6 +230,7 @@ public class Database {
         return contracts.toArray(new String [0]);
     }
     
+    @Override
     public String [] getFlats() throws ClassNotFoundException, SQLException{
         if(con == null) getConnection();
         Statement state = con.createStatement();
@@ -239,6 +242,7 @@ public class Database {
         return flats.toArray(new String [0]);
     }
 
+    @Override
     public ResultSet findHeatConsumption(Date nearestFrom, Date nearestTo) throws SQLException {
         try {
             if(con == null) getConnection();
@@ -253,6 +257,7 @@ public class Database {
         return null;
     }
 
+    @Override
     public ResultSet findMeasure(Date date) throws SQLException {
         try {
             if(con == null) getConnection();
@@ -266,6 +271,7 @@ public class Database {
         return null;
     }
 
+    @Override
     public Date findNearestMeasureDate(Date date) {
         try {
             if(con == null) getConnection();
@@ -285,7 +291,7 @@ public class Database {
         return null;
     }
 
-    ResultSet findTariff(Date validFrom) throws SQLException {
+    public ResultSet findTariff(Date validFrom) throws SQLException {
         try {
             if(con == null) getConnection();
             PreparedStatement prep = con.prepareStatement("SELECT * FROM 'tariffs' WHERE validFrom == ?");
@@ -298,7 +304,7 @@ public class Database {
         return null;
     }
 
-    ResultSet findFlat(int flatId) throws SQLException {
+    public ResultSet findFlat(int flatId) throws SQLException {
         try {
             if(con == null) getConnection();
             PreparedStatement prep = con.prepareStatement("SELECT * FROM 'flats' WHERE rowid == ?");
@@ -311,7 +317,7 @@ public class Database {
         return null;
     }
 
-    ResultSet findContract(String code) throws SQLException {
+    public ResultSet findContract(String code) throws SQLException {
         try {
             if(con == null) getConnection();
             PreparedStatement prep = con.prepareStatement("SELECT * FROM 'contracts' WHERE code == ?");
@@ -324,7 +330,7 @@ public class Database {
         return null;
     }
 
-    String getContractPersons(String code) {
+    public String getContractPersons(String code) {
         try {
             if(con == null) getConnection();
             PreparedStatement prep = con.prepareStatement("SELECT names FROM 'contractPersons' WHERE contract == ?");
@@ -338,7 +344,7 @@ public class Database {
         return "";
     }
 
-    int getFlatsSurface() {
+    public int getFlatsSurface() {
         try {
             if(con == null) getConnection();
             Statement state = con.createStatement();
