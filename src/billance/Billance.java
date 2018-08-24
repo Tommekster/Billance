@@ -5,6 +5,7 @@
  */
 package billance;
 
+import billance.data.TariffSelectionView;
 import billance.tools.EnergyBillanceCalculator;
 import billance.tools.ToolsProvider;
 import java.awt.Color;
@@ -54,7 +55,7 @@ public class Billance extends javax.swing.JFrame
     private void initDefaultValues() throws ClassNotFoundException, SQLException, ParseException
     {
         // load list of tarrifs
-        tarifCmb.setModel(new DefaultComboBoxModel<>(dateList2Strings(Tariff.getTarrifs())));
+        tarifCmb.setModel(new DefaultComboBoxModel<>(Tariff.getTarrifs(dateFormat)));
         tarifCmb.setSelectedIndex(-1);
         // load list of contracts
         contractCmb.setModel(new DefaultComboBoxModel<>(Contract.getContracts()));
@@ -84,7 +85,8 @@ public class Billance extends javax.swing.JFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -174,8 +176,10 @@ public class Billance extends javax.swing.JFrame
 
         jLabel9.setText("Due date");
 
-        contractCmb.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        contractCmb.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 contractCmbActionPerformed(evt);
             }
         });
@@ -193,8 +197,10 @@ public class Billance extends javax.swing.JFrame
         dueDate.setText("dd.MM.yyyy");
 
         continueButton.setText("Preview");
-        continueButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        continueButton.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 continueButtonActionPerformed(evt);
             }
         });
@@ -209,8 +215,10 @@ public class Billance extends javax.swing.JFrame
 
         exportBtn.setText("Export");
         exportBtn.setEnabled(false);
-        exportBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        exportBtn.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 exportBtnActionPerformed(evt);
             }
         });
@@ -325,10 +333,12 @@ public class Billance extends javax.swing.JFrame
         jLabel10.setText("Measured services");
 
         measuredServicesTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+            new Object [][]
+            {
 
             },
-            new String [] {
+            new String []
+            {
 
             }
         ));
@@ -338,10 +348,12 @@ public class Billance extends javax.swing.JFrame
         jLabel11.setText("Heat consumption");
 
         heatconsumptionTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+            new Object [][]
+            {
 
             },
-            new String [] {
+            new String []
+            {
 
             }
         ));
@@ -351,10 +363,12 @@ public class Billance extends javax.swing.JFrame
         jLabel12.setText("Summary");
 
         summaryTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+            new Object [][]
+            {
 
             },
-            new String [] {
+            new String []
+            {
 
             }
         ));
@@ -913,7 +927,7 @@ public class Billance extends javax.swing.JFrame
     private javax.swing.JLabel nearestEndDate;
     private javax.swing.JTextField personText;
     private javax.swing.JTable summaryTable;
-    private javax.swing.JComboBox<String> tarifCmb;
+    private javax.swing.JComboBox<TariffSelectionView> tarifCmb;
     private javax.swing.JLabel totalCosts;
     private javax.swing.JLabel volumeCoef;
     // End of variables declaration//GEN-END:variables

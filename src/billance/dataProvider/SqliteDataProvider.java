@@ -1,12 +1,15 @@
 package billance.dataProvider;
 
+import billance.data.TariffSelectionView;
 import java.sql.*;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  *
@@ -19,7 +22,7 @@ public class SqliteDataProvider implements IDataProvider
     private boolean hasData = false;
 
     @Override
-    public Date[] getTarrifs() throws ClassNotFoundException, SQLException, ParseException
+    public TariffSelectionView[] loadTarrifs(DateFormat format) throws ClassNotFoundException, SQLException, ParseException
     {
         if (con == null)
         {
@@ -27,12 +30,23 @@ public class SqliteDataProvider implements IDataProvider
         }
         Statement state = con.createStatement();
         ResultSet rs = state.executeQuery("SELECT validFrom FROM tariffs ORDER BY validFrom");
-        List<Date> tarrifs = new LinkedList<>();
-        while (rs.next())
-        {
-            tarrifs.add(DateFormatProvider.getDate(rs, "validFrom"));
-        }
-        return tarrifs.toArray(new Date[0]);
+        return Stream.of(rs)
+                .map(x ->
+                    {
+                        try
+                        {
+                            Date validFrom = DateFormatProvider.getDate(x, "validFrom");
+                            TariffSelectionView tsv = new TariffSelectionView();
+                            tsv.validFrom = format.format(validFrom);
+                            return tsv;
+                        }
+                        catch (SQLException | ParseException ex)
+                        {
+                            return null;
+                        }
+                    })
+                .filter(x -> x != null)
+                .toArray(TariffSelectionView[]::new);
     }
 
     @Override

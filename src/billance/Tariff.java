@@ -5,6 +5,7 @@
  */
 package billance;
 
+import billance.data.TariffSelectionView;
 import billance.dataProvider.DataProviderManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import java.lang.reflect.*;
+import java.text.DateFormat;
 
 /**
  *
@@ -33,9 +35,9 @@ public class Tariff
     public float combustionHeat;
     public float surfaceCoef;
 
-    public static Date[] getTarrifs() throws ClassNotFoundException, SQLException, ParseException
+    public static TariffSelectionView[] getTarrifs(DateFormat format) throws ClassNotFoundException, SQLException, ParseException
     {
-        return DataProviderManager.getDataProviderInstance().getTarrifs();
+        return DataProviderManager.getDataProviderInstance().loadTarrifs(format);
     }
 
     private Tariff()
@@ -81,4 +83,5 @@ public class Tariff
     {
         return fee + ((eletricity) ? elfee : 0);
     }
+
 }
