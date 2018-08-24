@@ -1,6 +1,8 @@
 package billance.dataProvider;
 
 import billance.data.TariffSelectionView;
+import billance.data.Tariff;
+import java.lang.reflect.Field;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -20,34 +22,6 @@ public class SqliteDataProvider implements IDataProvider
 
     private Connection con;
     private boolean hasData = false;
-
-    @Override
-    public TariffSelectionView[] loadTarrifs(DateFormat format) throws ClassNotFoundException, SQLException, ParseException
-    {
-        if (con == null)
-        {
-            getConnection();
-        }
-        Statement state = con.createStatement();
-        ResultSet rs = state.executeQuery("SELECT validFrom FROM tariffs ORDER BY validFrom");
-        return Stream.of(rs)
-                .map(x ->
-                    {
-                        try
-                        {
-                            Date validFrom = DateFormatProvider.getDate(x, "validFrom");
-                            TariffSelectionView tsv = new TariffSelectionView();
-                            tsv.validFrom = format.format(validFrom);
-                            return tsv;
-                        }
-                        catch (SQLException | ParseException ex)
-                        {
-                            return null;
-                        }
-                    })
-                .filter(x -> x != null)
-                .toArray(TariffSelectionView[]::new);
-    }
 
     @Override
     public String[] getContracts() throws ClassNotFoundException, SQLException
@@ -151,7 +125,43 @@ public class SqliteDataProvider implements IDataProvider
     }
 
     @Override
-    public ResultSet findTariff(Date validFrom) throws SQLException
+    public TariffSelectionView[] loadTarrifs(DateFormat format)
+    {
+        try
+        {
+            if (con == null)
+            {
+                getConnection();
+            }
+            Statement state = con.createStatement();
+            ResultSet rs = state.executeQuery("SELECT validFrom FROM tariffs ORDER BY validFrom");
+            return Stream.of(rs)
+                    .map(x ->
+                    {
+                        try
+                        {
+                            Date validFrom = DateFormatProvider.getDate(x, "validFrom");
+                            TariffSelectionView tsv = new TariffSelectionView();
+                            tsv.validFrom = format.format(validFrom);
+                            return tsv;
+                        }
+                        catch (SQLException | ParseException ex)
+                        {
+                            return null;
+                        }
+                    })
+                    .filter(x -> x != null)
+                    .toArray(TariffSelectionView[]::new);
+        }
+        catch (SQLException | ClassNotFoundException ex)
+        {
+            Logger.getLogger(SqliteDataProvider.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return new TariffSelectionView[0];
+    }
+
+    @Override
+    public Tariff getTariff(Date validFrom)
     {
         try
         {
@@ -162,11 +172,21 @@ public class SqliteDataProvider implements IDataProvider
             PreparedStatement prep = con.prepareStatement("SELECT * FROM 'tariffs' WHERE validFrom == ?");
             prep.setString(1, DateFormatProvider.getDateFormat().format(validFrom));
             ResultSet rs = prep.executeQuery();
-            return rs;
+            if (!rs.next())
+            {
+                return null;
+            }
+            Tariff t = new Tariff();
+            Field[] fields = Tariff.class.getFields();
+            for (Field field : fields)
+            {
+                field.set(t, rs.getFloat(field.getName()));
+            }
+            return t;
         }
-        catch (ClassNotFoundException ex)
+        catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | SQLException ex)
         {
-            Logger.getLogger(DataProviderManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SqliteDataProvider.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

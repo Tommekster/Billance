@@ -5,7 +5,10 @@
  */
 package billance;
 
+import billance.data.Tariff;
 import billance.data.TariffSelectionView;
+import billance.dataProvider.DataProviderManager;
+import billance.dataProvider.IDataProvider;
 import billance.tools.EnergyBillanceCalculator;
 import billance.tools.ToolsProvider;
 import java.awt.Color;
@@ -54,8 +57,10 @@ public class Billance extends javax.swing.JFrame
 
     private void initDefaultValues() throws ClassNotFoundException, SQLException, ParseException
     {
+        IDataProvider provider = DataProviderManager.getDataProviderInstance();
+        
         // load list of tarrifs
-        tarifCmb.setModel(new DefaultComboBoxModel<>(Tariff.getTarrifs(dateFormat)));
+        tarifCmb.setModel(new DefaultComboBoxModel<>(provider.loadTarrifs(dateFormat)));
         tarifCmb.setSelectedIndex(-1);
         // load list of contracts
         contractCmb.setModel(new DefaultComboBoxModel<>(Contract.getContracts()));
@@ -635,6 +640,7 @@ public class Billance extends javax.swing.JFrame
     private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
         try
         {
+            IDataProvider provider = DataProviderManager.getDataProviderInstance();
             // check values
             if (flatCmb.getSelectedItem() == null || tarifCmb.getSelectedItem() == null)
             {
@@ -645,7 +651,7 @@ public class Billance extends javax.swing.JFrame
             int deposit = getIntValue(depositText);
             boolean isEletricity = eletricityChck.isSelected();
             Flat flat = Flat.findFlat(Integer.parseInt((String) flatCmb.getSelectedItem()));
-            Tariff tariff = Tariff.findTariff(dateFormat.parse((String) tarifCmb.getSelectedItem()));
+            Tariff tariff = provider.getTariff(dateFormat.parse(tarifCmb.getSelectedItem().toString()));
 
             EnergyBillanceCalculator calculator = ToolsProvider.getTool(EnergyBillanceCalculator.class);
             EnergyBillance billance = calculator.calculateBillance(from, to, flat, tariff, isEletricity, deposit);

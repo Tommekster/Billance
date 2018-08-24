@@ -15,6 +15,7 @@
  */
 package billance;
 
+import billance.data.Tariff;
 import billance.dataProvider.DataProviderManager;
 import billance.dataProvider.DateFormatProvider;
 import java.lang.reflect.Field;

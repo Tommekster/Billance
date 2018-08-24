@@ -2,7 +2,7 @@ package billance.tools;
 
 import billance.EnergyBillance;
 import billance.Flat;
-import billance.Tariff;
+import billance.data.Tariff;
 import java.util.Date;
 
 public class EnergyBillanceCalculator

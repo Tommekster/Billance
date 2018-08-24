@@ -6,6 +6,7 @@
 package billance.dataProvider;
 
 import billance.data.TariffSelectionView;
+import billance.data.Tariff;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -37,8 +38,8 @@ public interface IDataProvider
 
     int getFlatsSurface();
 
-    TariffSelectionView[] loadTarrifs(DateFormat format) throws ClassNotFoundException, SQLException, ParseException;
+    TariffSelectionView[] loadTarrifs(DateFormat format);
 
-    ResultSet findTariff(Date validFrom) throws SQLException;
+    Tariff getTariff(Date validFrom);
 
 }
