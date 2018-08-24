@@ -9,6 +9,7 @@ import billance.data.Tariff;
 import billance.data.TariffSelectionView;
 import billance.dataProvider.DataProviderManager;
 import billance.dataProvider.IDataProvider;
+import billance.remote.ContractImporter;
 import billance.tools.EnergyBillanceCalculator;
 import billance.tools.ToolsProvider;
 import java.awt.Color;
@@ -631,6 +632,13 @@ public class Billance extends javax.swing.JFrame
         remoteMenu.setText("Remote");
 
         importMenuItem.setText("Import Contracts");
+        importMenuItem.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                importMenuItemActionPerformed(evt);
+            }
+        });
         remoteMenu.add(importMenuItem);
 
         mainMenu.add(remoteMenu);
@@ -767,6 +775,11 @@ public class Billance extends javax.swing.JFrame
             incorrectFields();
         }
     }//GEN-LAST:event_exportBtnActionPerformed
+
+    private void importMenuItemActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_importMenuItemActionPerformed
+    {//GEN-HEADEREND:event_importMenuItemActionPerformed
+        new ContractImporter().Import();
+    }//GEN-LAST:event_importMenuItemActionPerformed
 
     private void loadValuesFromContract(Contract contract)
     {
