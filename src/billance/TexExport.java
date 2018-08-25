@@ -54,7 +54,7 @@ public class TexExport implements BillanceExporter
             DecimalFormat cf = new DecimalFormat("#,##0.00");
             writer.write(defCommand("doklad", preambule.docNumber));
             writer.write(defCommand("smlouva", preambule.contract));
-            writer.write(defCommand("byt", Integer.toString(billance.getFlat().getFlatId())));
+            writer.write(defCommand("byt", Integer.toString(billance.getFlat().number)));
             writer.write(defCommand("sod", df.format(billance.getBegin())));
             writer.write(defCommand("sdo", df.format(billance.getEnd())));
             writer.write(defCommand("komu", preambule.persons));

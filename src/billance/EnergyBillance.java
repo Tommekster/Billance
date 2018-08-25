@@ -15,6 +15,7 @@
  */
 package billance;
 
+import billance.data.FlatView;
 import billance.data.Tariff;
 import billance.dataProvider.DataProviderManager;
 import billance.dataProvider.DateFormatProvider;
@@ -39,7 +40,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class EnergyBillance
 {
-    public static EnergyBillance loadMeasures(Date from, Date to, Flat flat, Tariff tariff, boolean eletricity, int deposit)
+    public static EnergyBillance loadMeasures(Date from, Date to, FlatView flat, Tariff tariff, boolean eletricity, int deposit)
     {
         EnergyBillance m = new EnergyBillance();
         m.deposit = deposit;
@@ -73,7 +74,7 @@ public class EnergyBillance
     Tariff tariff;
     Date periodFrom;
     Date periodTo;
-    Flat flat;
+    FlatView flat;
     Date nearestFrom;
     Date nearestTo;
     int waterBeg;
@@ -238,7 +239,7 @@ public class EnergyBillance
     {
         return tariff;
     }
-    Flat getFlat()
+    FlatView getFlat()
     {
         return flat;
     }

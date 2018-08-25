@@ -1,6 +1,7 @@
 package billance.dataProvider;
 
 import billance.data.ContractView;
+import billance.data.FlatView;
 import billance.data.TariffSelectionView;
 import billance.data.Tariff;
 import java.lang.reflect.Field;
@@ -106,7 +107,7 @@ public class SqliteDataProvider implements IDataProvider
             ResultSet resultSet = state.executeQuery(query);
             ContractView[] contracts = new ResultSetIterator(resultSet)
                     .toStream()
-                    .map(rs->this.mapper.map(rs,ContractView.class))
+                    .map(rs -> this.mapper.map(rs, ContractView.class))
                     .filter(x -> x != null)
                     .toArray(ContractView[]::new);
             return contracts;
@@ -115,24 +116,30 @@ public class SqliteDataProvider implements IDataProvider
         {
             Logger.getLogger(SqliteDataProvider.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
+        return new ContractView[0];
     }
 
     @Override
-    public String[] getFlats() throws ClassNotFoundException, SQLException
+    public FlatView[] loadFlats()
     {
-        if (con == null)
+        try
         {
-            getConnection();
+            if (con == null)
+            {
+                getConnection();
+            }
+            Statement state = con.createStatement();
+            ResultSet rs = state.executeQuery("SELECT * FROM flatViews ORDER BY number");
+            return new ResultSetIterator(rs).toStream()
+                    .map(x -> this.mapper.map(x, FlatView.class))
+                    .filter(x -> x != null)
+                    .toArray(FlatView[]::new);
         }
-        Statement state = con.createStatement();
-        ResultSet rs = state.executeQuery("SELECT rowid FROM flats ORDER BY rowid");
-        List<String> flats = new LinkedList<>();
-        while (rs.next())
+        catch (ClassNotFoundException | SQLException ex)
         {
-            flats.add(rs.getString("rowid"));
+            Logger.getLogger(SqliteDataProvider.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return flats.toArray(new String[0]);
+        return new FlatView[0];
     }
 
     @Override
@@ -197,56 +204,14 @@ public class SqliteDataProvider implements IDataProvider
         return null;
     }
 
-    @Override
-    public ResultSet findFlat(int flatId) throws SQLException
-    {
-        try
-        {
-            if (con == null)
-            {
-                getConnection();
-            }
-            PreparedStatement prep = con.prepareStatement("SELECT * FROM 'flats' WHERE rowid == ?");
-            prep.setInt(1, flatId);
-            ResultSet rs = prep.executeQuery();
-            return rs;
-        }
-        catch (ClassNotFoundException ex)
-        {
-            Logger.getLogger(DataProviderManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-
-    @Override
-    public int getFlatsSurface()
-    {
-        try
-        {
-            if (con == null)
-            {
-                getConnection();
-            }
-            Statement state = con.createStatement();
-            ResultSet rs = state.executeQuery("SELECT sum(surface) AS sum FROM flats");
-            rs.next();
-            return rs.getInt("sum");
-        }
-        catch (ClassNotFoundException | SQLException ex)
-        {
-            Logger.getLogger(DataProviderManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return 0;
-    }
-
     private void getConnection() throws ClassNotFoundException, SQLException
     {
         Class.forName("org.sqlite.JDBC");
         con = DriverManager.getConnection("jdbc:sqlite:database1.sqlite");
-        initialise();
+        initialize();
     }
 
-    private void initialise() throws SQLException
+    private void initialize() throws SQLException
     {
         if (!hasData)
         {
@@ -262,6 +227,7 @@ public class SqliteDataProvider implements IDataProvider
             checkHeatConsumptionView();
             checkContractPersonsView();
             checkContractViewsView();
+            checkFlatViewsView();
         }
     }
 
@@ -383,17 +349,37 @@ public class SqliteDataProvider implements IDataProvider
         {
             // build the table
             Statement state2 = con.createStatement();
-            state2.execute("CREATE VIEW contractViews AS\n" +
-"    SELECT code,\n" +
-"           [from] AS activeFrom,\n" +
-"           [to] AS activeTo,\n" +
-"           flat,\n" +
-"           eletricity,\n" +
-"           names\n" +
-"      FROM contracts\n" +
-"           JOIN\n" +
-"           contractPersons ON contracts.code = contractPersons.contract\n" +
-"     WHERE contracts.archived = 0;");
+            state2.execute("CREATE VIEW contractViews AS\n"
+                    + "    SELECT code,\n"
+                    + "           [from] AS activeFrom,\n"
+                    + "           [to] AS activeTo,\n"
+                    + "           flat,\n"
+                    + "           eletricity,\n"
+                    + "           names\n"
+                    + "      FROM contracts\n"
+                    + "           JOIN\n"
+                    + "           contractPersons ON contracts.code = contractPersons.contract\n"
+                    + "     WHERE contracts.archived = 0;");
+        }
+    }
+
+    private void checkFlatViewsView() throws SQLException
+    {
+        Statement state = con.createStatement();
+        ResultSet res = state.executeQuery("SELECT name FROM sqlite_master WHERE type='view' AND name = 'flatViews'");
+        if (!res.next())
+        {
+            // build the table
+            Statement state2 = con.createStatement();
+            state2.execute("CREATE VIEW flatViews AS\n"
+                    + "    SELECT t1.rowid AS id,\n"
+                    + "           t1.rowid AS number,\n"
+                    + "           t1.*,\n"
+                    + "           sum(t2.surface) AS commonSurface\n"
+                    + "      FROM flats AS t1\n"
+                    + "           INNER JOIN\n"
+                    + "           flats AS t2 ON 1 = 1\n"
+                    + "     GROUP BY t1.rowid;");
         }
     }
 

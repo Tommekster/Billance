@@ -8,6 +8,7 @@ package billance;
 import billance.data.ContractView;
 import billance.data.Tariff;
 import billance.data.TariffSelectionView;
+import billance.data.FlatView;
 import billance.dataProvider.DataProviderManager;
 import billance.dataProvider.IDataProvider;
 import billance.remote.ContractImporter;
@@ -60,7 +61,7 @@ public class Billance extends javax.swing.JFrame
     private void initDefaultValues() throws ClassNotFoundException, SQLException, ParseException
     {
         IDataProvider provider = DataProviderManager.getDataProviderInstance();
-        
+
         // load list of tarrifs
         tarifCmb.setModel(new DefaultComboBoxModel<>(provider.loadTarrifs(dateFormat)));
         tarifCmb.setSelectedIndex(-1);
@@ -68,7 +69,7 @@ public class Billance extends javax.swing.JFrame
         contractCmb.setModel(new DefaultComboBoxModel<>(provider.loadContracts()));
         contractCmb.setSelectedIndex(-1);
         // load list of contracts
-        flatCmb.setModel(new DefaultComboBoxModel<>(Flat.getFlats()));
+        flatCmb.setModel(new DefaultComboBoxModel<>(provider.loadFlats()));
         flatCmb.setSelectedIndex(-1);
         Date currentDate = Calendar.getInstance().getTime();
         documentText.setText((new SimpleDateFormat("yy000")).format(currentDate));
@@ -685,7 +686,7 @@ public class Billance extends javax.swing.JFrame
             Date to = getDateValue(endDate);
             int deposit = getIntValue(depositText);
             boolean isEletricity = eletricityChck.isSelected();
-            Flat flat = Flat.findFlat(Integer.parseInt((String) flatCmb.getSelectedItem()));
+            FlatView flat = (FlatView) flatCmb.getSelectedItem();
             Tariff tariff = provider.getTariff(dateFormat.parse(tarifCmb.getSelectedItem().toString()));
 
             EnergyBillanceCalculator calculator = ToolsProvider.getTool(EnergyBillanceCalculator.class);
@@ -776,15 +777,7 @@ public class Billance extends javax.swing.JFrame
     private void loadValuesFromContract(ContractView contract)
     {
         eletricityChck.setSelected(contract.eletricity);
-        String flatId = Integer.toString(contract.flat.intValue());
-        for (int i = 0; i < flatCmb.getItemCount(); i++)
-        {
-            if (flatCmb.getItemAt(i).equals(flatId))
-            {
-                flatCmb.setSelectedIndex(i);
-                break;
-            }
-        }
+        flatCmb.setSelectedIndex(-1);
         beginDate.setText(dateFormat.format(contract.activeFrom));
         endDate.setText(dateFormat.format(contract.activeTo));
         personText.setText(contract.names);
@@ -908,7 +901,7 @@ public class Billance extends javax.swing.JFrame
     private javax.swing.JTextField endDate;
     private javax.swing.JButton exportBtn;
     private javax.swing.JMenuItem exportMenuItem;
-    private javax.swing.JComboBox<String> flatCmb;
+    private javax.swing.JComboBox<FlatView> flatCmb;
     private javax.swing.JLabel flatCoef;
     private javax.swing.JLabel gasCons;
     private javax.swing.JLabel heatCons;

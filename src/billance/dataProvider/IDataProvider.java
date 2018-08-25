@@ -6,6 +6,7 @@
 package billance.dataProvider;
 
 import billance.data.ContractView;
+import billance.data.FlatView;
 import billance.data.TariffSelectionView;
 import billance.data.Tariff;
 import java.sql.ResultSet;
@@ -29,11 +30,7 @@ public interface IDataProvider
 
     ContractView[] loadContracts();
 
-    String[] getFlats() throws ClassNotFoundException, SQLException;
-
-    ResultSet findFlat(int flatId) throws SQLException;
-
-    int getFlatsSurface();
+    FlatView[] loadFlats();
 
     TariffSelectionView[] loadTarrifs(DateFormat format);
 
