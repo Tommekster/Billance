@@ -7,7 +7,7 @@ public class TariffSelectionView
     @Override
     public String toString()
     {
-        return validFrom; //To change body of generated methods, choose Tools | Templates.
+        return validFrom; 
     }
 
 }

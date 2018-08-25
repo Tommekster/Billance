@@ -25,6 +25,7 @@ public class ResultSetObjectMapper
         this.RegisterResultSetGetter(Double.class, (rs, n) -> Double.valueOf(rs.getDouble(n)));
         this.RegisterResultSetGetter(int.class, (rs, n) -> rs.getInt(n));
         this.RegisterResultSetGetter(Integer.class, (rs, n) -> Integer.valueOf(rs.getInt(n)));
+        this.RegisterResultSetGetter(Long.class, (rs, n) -> Long.valueOf(rs.getInt(n)));
         this.RegisterResultSetGetter(boolean.class, (rs, n) -> rs.getBoolean(n));
         this.RegisterResultSetGetter(Boolean.class, (rs, n) -> Boolean.valueOf(rs.getBoolean(n)));
         this.RegisterResultSetGetter(String.class, (rs, n) -> rs.getString(n));
@@ -39,6 +40,7 @@ public class ResultSetObjectMapper
             Stream.of(type.getFields())
                     .filter(f -> f.getAnnotation(ResultSetField.class) != null)
                     .forEach(f -> this.setField(resultSet, f, dest));
+            return dest;
         }
         catch (InstantiationException | IllegalAccessException ex)
         {
@@ -58,7 +60,8 @@ public class ResultSetObjectMapper
         {
             Class<?> fieldType = field.getType();
             String fieldName = this.getResultSetFieldName(field);
-            field.set(destination, this.getObject(resultSet, fieldName, fieldType));
+            System.out.println(fieldType.getName()+" "+fieldName);
+            field.set(destination, this.getValue(resultSet, fieldName, fieldType));
         }
         catch (IllegalArgumentException | IllegalAccessException | SQLException ex)
         {
@@ -73,9 +76,11 @@ public class ResultSetObjectMapper
         return !name.isEmpty() ? name : field.getName();
     }
 
-    private <T> T getObject(ResultSet resultSet, String fieldName, Class<T> fieldType) throws SQLException
+    private <T> T getValue(ResultSet resultSet, String fieldName, Class<T> fieldType) throws SQLException
     {
-        return (T) this.rsGetters.get(fieldType).apply(resultSet, fieldName);
+        T value = (T) this.rsGetters.get(fieldType).apply(resultSet, fieldName);
+        System.out.println(value);
+        return value;
     }
 
     @FunctionalInterface

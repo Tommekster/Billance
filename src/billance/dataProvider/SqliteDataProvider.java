@@ -1,5 +1,6 @@
 package billance.dataProvider;
 
+import billance.data.ContractView;
 import billance.data.TariffSelectionView;
 import billance.data.Tariff;
 import java.lang.reflect.Field;
@@ -22,40 +23,7 @@ public class SqliteDataProvider implements IDataProvider
 
     private Connection con;
     private boolean hasData = false;
-
-    @Override
-    public String[] getContracts() throws ClassNotFoundException, SQLException
-    {
-        if (con == null)
-        {
-            getConnection();
-        }
-        Statement state = con.createStatement();
-        ResultSet rs = state.executeQuery("SELECT code FROM contracts WHERE NOT archived ORDER BY 'from'");
-        List<String> contracts = new LinkedList<>();
-        while (rs.next())
-        {
-            contracts.add(rs.getString("code"));
-        }
-        return contracts.toArray(new String[0]);
-    }
-
-    @Override
-    public String[] getFlats() throws ClassNotFoundException, SQLException
-    {
-        if (con == null)
-        {
-            getConnection();
-        }
-        Statement state = con.createStatement();
-        ResultSet rs = state.executeQuery("SELECT rowid FROM flats ORDER BY rowid");
-        List<String> flats = new LinkedList<>();
-        while (rs.next())
-        {
-            flats.add(rs.getString("rowid"));
-        }
-        return flats.toArray(new String[0]);
-    }
+    private final ResultSetObjectMapper mapper = new ResultSetObjectMapper();
 
     @Override
     public ResultSet findHeatConsumption(Date nearestFrom, Date nearestTo) throws SQLException
@@ -122,6 +90,51 @@ public class SqliteDataProvider implements IDataProvider
             Logger.getLogger(DataProviderManager.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    @Override
+    public ContractView[] loadContracts()
+    {
+        try
+        {
+            if (con == null)
+            {
+                getConnection();
+            }
+            Statement state = con.createStatement();
+            String query = "SELECT * FROM 'contractViews'";
+            ResultSet resultSet = state.executeQuery(query);
+            ContractView[] contracts = new ResultSetIterator(resultSet)
+                    .toStream()
+                    .map(rs->this.mapper.map(rs,ContractView.class))
+                    .filter(x -> x != null)
+                    .toArray(ContractView[]::new);
+            System.out.println(contracts);
+            System.out.println(contracts.length);
+            return contracts;
+        }
+        catch (ClassNotFoundException | SQLException ex)
+        {
+            Logger.getLogger(SqliteDataProvider.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    @Override
+    public String[] getFlats() throws ClassNotFoundException, SQLException
+    {
+        if (con == null)
+        {
+            getConnection();
+        }
+        Statement state = con.createStatement();
+        ResultSet rs = state.executeQuery("SELECT rowid FROM flats ORDER BY rowid");
+        List<String> flats = new LinkedList<>();
+        while (rs.next())
+        {
+            flats.add(rs.getString("rowid"));
+        }
+        return flats.toArray(new String[0]);
     }
 
     @Override
@@ -213,52 +226,6 @@ public class SqliteDataProvider implements IDataProvider
     }
 
     @Override
-    public ResultSet findContract(String code) throws SQLException
-    {
-        try
-        {
-            if (con == null)
-            {
-                getConnection();
-            }
-            PreparedStatement prep = con.prepareStatement("SELECT * FROM 'contracts' WHERE code == ?");
-            prep.setString(1, code);
-            ResultSet rs = prep.executeQuery();
-            return rs;
-        }
-        catch (ClassNotFoundException ex)
-        {
-            Logger.getLogger(DataProviderManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-
-    @Override
-    public String getContractPersons(String code)
-    {
-        try
-        {
-            if (con == null)
-            {
-                getConnection();
-            }
-            PreparedStatement prep = con.prepareStatement("SELECT names FROM 'contractPersons' WHERE contract == ?");
-            prep.setString(1, code);
-            ResultSet rs = prep.executeQuery();
-            if (!rs.next())
-            {
-                return "";
-            }
-            return rs.getString("names");
-        }
-        catch (ClassNotFoundException | SQLException ex)
-        {
-            Logger.getLogger(DataProviderManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return "";
-    }
-
-    @Override
     public int getFlatsSurface()
     {
         try
@@ -301,6 +268,7 @@ public class SqliteDataProvider implements IDataProvider
             checkMeasuresDateView();
             checkHeatConsumptionView();
             checkContractPersonsView();
+            checkContractViewsView();
         }
     }
 
@@ -411,6 +379,28 @@ public class SqliteDataProvider implements IDataProvider
             // build the table
             Statement state2 = con.createStatement();
             state2.execute("CREATE VIEW contractPersons AS SELECT c.contract, group_concat(p.name || ' ' || p.surname,', ') AS names FROM persons AS p JOIN personcontracts AS c ON p.rowid == c.person GROUP BY c.contract");
+        }
+    }
+
+    private void checkContractViewsView() throws SQLException
+    {
+        Statement state = con.createStatement();
+        ResultSet res = state.executeQuery("SELECT name FROM sqlite_master WHERE type='view' AND name = 'contractViews'");
+        if (!res.next())
+        {
+            // build the table
+            Statement state2 = con.createStatement();
+            state2.execute("CREATE VIEW contractViews AS\n" +
+"    SELECT code,\n" +
+"           [from] AS activeFrom,\n" +
+"           [to] AS activeTo,\n" +
+"           flat,\n" +
+"           eletricity,\n" +
+"           names\n" +
+"      FROM contracts\n" +
+"           JOIN\n" +
+"           contractPersons ON contracts.code = contractPersons.contract\n" +
+"     WHERE contracts.archived = 0;");
         }
     }
 

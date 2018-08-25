@@ -5,6 +5,7 @@
  */
 package billance.dataProvider;
 
+import billance.data.ContractView;
 import billance.data.TariffSelectionView;
 import billance.data.Tariff;
 import java.sql.ResultSet;
@@ -26,11 +27,7 @@ public interface IDataProvider
 
     Date findNearestMeasureDate(Date date);
 
-    String[] getContracts() throws ClassNotFoundException, SQLException;
-
-    ResultSet findContract(String code) throws SQLException;
-
-    String getContractPersons(String code);
+    ContractView[] loadContracts();
 
     String[] getFlats() throws ClassNotFoundException, SQLException;
 

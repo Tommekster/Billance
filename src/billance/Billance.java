@@ -5,6 +5,7 @@
  */
 package billance;
 
+import billance.data.ContractView;
 import billance.data.Tariff;
 import billance.data.TariffSelectionView;
 import billance.dataProvider.DataProviderManager;
@@ -64,7 +65,7 @@ public class Billance extends javax.swing.JFrame
         tarifCmb.setModel(new DefaultComboBoxModel<>(provider.loadTarrifs(dateFormat)));
         tarifCmb.setSelectedIndex(-1);
         // load list of contracts
-        contractCmb.setModel(new DefaultComboBoxModel<>(Contract.getContracts()));
+        contractCmb.setModel(new DefaultComboBoxModel<>(provider.loadContracts()));
         contractCmb.setSelectedIndex(-1);
         // load list of contracts
         flatCmb.setModel(new DefaultComboBoxModel<>(Flat.getFlats()));
@@ -743,20 +744,11 @@ public class Billance extends javax.swing.JFrame
     }
 
     private void contractCmbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contractCmbActionPerformed
-        try
+        if (evt.getSource() != contractCmb || contractCmb.getSelectedItem() == null)
         {
-            if (evt.getSource() != contractCmb || contractCmb.getSelectedItem() == null)
-            {
-                return;
-            }
-            Contract contract = Contract.findContract((String) contractCmb.getSelectedItem());
-            loadValuesFromContract(contract);
+            return;
         }
-        catch (ParseException ex)
-        {
-            JOptionPane.showMessageDialog(this,"Error: Some field has wrong format!");
-            Logger.getLogger(Billance.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        loadValuesFromContract((ContractView) contractCmb.getSelectedItem());
     }//GEN-LAST:event_contractCmbActionPerformed
 
     private void exportBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportBtnActionPerformed
@@ -781,10 +773,10 @@ public class Billance extends javax.swing.JFrame
         new ContractImporter().Import();
     }//GEN-LAST:event_importMenuItemActionPerformed
 
-    private void loadValuesFromContract(Contract contract)
+    private void loadValuesFromContract(ContractView contract)
     {
         eletricityChck.setSelected(contract.eletricity);
-        String flatId = Integer.toString(contract.flat);
+        String flatId = Integer.toString(contract.flat.intValue());
         for (int i = 0; i < flatCmb.getItemCount(); i++)
         {
             if (flatCmb.getItemAt(i).equals(flatId))
@@ -793,9 +785,9 @@ public class Billance extends javax.swing.JFrame
                 break;
             }
         }
-        beginDate.setText(dateFormat.format(contract.from));
-        endDate.setText(dateFormat.format(contract.to));
-        personText.setText(contract.getPersons());
+        beginDate.setText(dateFormat.format(contract.activeFrom));
+        endDate.setText(dateFormat.format(contract.activeTo));
+        personText.setText(contract.names);
     }
 
     /**
@@ -848,16 +840,6 @@ public class Billance extends javax.swing.JFrame
             }
 
         });
-    }
-
-    private String[] dateList2Strings(Date[] dl)
-    {
-        String[] strings = new String[dl.length];
-        for (int i = 0; i < dl.length; i++)
-        {
-            strings[i] = dateFormat.format(dl[i]);
-        }
-        return strings;
     }
 
     private Date getDateValue(JTextField textField) throws ParseException
@@ -917,7 +899,7 @@ public class Billance extends javax.swing.JFrame
     private javax.swing.JLabel commonHeatCons;
     private javax.swing.JLabel consPart;
     private javax.swing.JButton continueButton;
-    private javax.swing.JComboBox<String> contractCmb;
+    private javax.swing.JComboBox<ContractView> contractCmb;
     private javax.swing.JLabel depositField;
     private javax.swing.JTextField depositText;
     private javax.swing.JTextField documentText;
