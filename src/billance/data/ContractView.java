@@ -2,6 +2,8 @@ package billance.data;
 
 import billance.dataProvider.ResultSetField;
 import com.github.tommekster.jsonRpcClient.JsonRpcDataMember;
+import com.github.tommekster.jsonRpcClient.convertors.DefaultDateConvertor;
+import com.github.tommekster.jsonRpcClient.convertors.JsonRpcConvertor;
 import java.util.Date;
 
 /**
@@ -14,11 +16,13 @@ public class ContractView
     @ResultSetField
     public String code;
     
-    //@JsonRpcDataMember
+    @JsonRpcDataMember
+    @JsonRpcConvertor(convertor = DefaultDateConvertor.class)
     @ResultSetField
     public Date activeFrom;
     
-    //@JsonRpcDataMember
+    @JsonRpcDataMember
+    @JsonRpcConvertor(convertor = DefaultDateConvertor.class)
     @ResultSetField
     public Date activeTo;
     
