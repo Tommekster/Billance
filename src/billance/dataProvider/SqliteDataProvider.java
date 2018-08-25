@@ -109,8 +109,6 @@ public class SqliteDataProvider implements IDataProvider
                     .map(rs->this.mapper.map(rs,ContractView.class))
                     .filter(x -> x != null)
                     .toArray(ContractView[]::new);
-            System.out.println(contracts);
-            System.out.println(contracts.length);
             return contracts;
         }
         catch (ClassNotFoundException | SQLException ex)

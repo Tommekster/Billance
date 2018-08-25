@@ -60,7 +60,6 @@ public class ResultSetObjectMapper
         {
             Class<?> fieldType = field.getType();
             String fieldName = this.getResultSetFieldName(field);
-            System.out.println(fieldType.getName()+" "+fieldName);
             field.set(destination, this.getValue(resultSet, fieldName, fieldType));
         }
         catch (IllegalArgumentException | IllegalAccessException | SQLException ex)
@@ -79,7 +78,6 @@ public class ResultSetObjectMapper
     private <T> T getValue(ResultSet resultSet, String fieldName, Class<T> fieldType) throws SQLException
     {
         T value = (T) this.rsGetters.get(fieldType).apply(resultSet, fieldName);
-        System.out.println(value);
         return value;
     }
 
