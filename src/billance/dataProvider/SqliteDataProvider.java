@@ -117,7 +117,7 @@ public class SqliteDataProvider implements IDataProvider
                 return DateFormatProvider.getDate(rs, "date");
             }
         }
-        catch (ClassNotFoundException | SQLException | ParseException ex)
+        catch (ClassNotFoundException | SQLException ex)
         {
             Logger.getLogger(DataProviderManager.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -135,7 +135,7 @@ public class SqliteDataProvider implements IDataProvider
             }
             Statement state = con.createStatement();
             ResultSet rs = state.executeQuery("SELECT validFrom FROM tariffs ORDER BY validFrom");
-            return Stream.of(rs)
+            return new ResultSetIterator(rs).toStream()
                     .map(x ->
                     {
                         try
@@ -145,7 +145,7 @@ public class SqliteDataProvider implements IDataProvider
                             tsv.validFrom = format.format(validFrom);
                             return tsv;
                         }
-                        catch (SQLException | ParseException ex)
+                        catch (SQLException ex)
                         {
                             return null;
                         }
