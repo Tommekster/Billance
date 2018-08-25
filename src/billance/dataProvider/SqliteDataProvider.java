@@ -187,15 +187,10 @@ public class SqliteDataProvider implements IDataProvider
             {
                 return null;
             }
-            Tariff t = new Tariff();
-            Field[] fields = Tariff.class.getFields();
-            for (Field field : fields)
-            {
-                field.set(t, rs.getFloat(field.getName()));
-            }
+            Tariff t = this.mapper.map(rs, Tariff.class);
             return t;
         }
-        catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | SQLException ex)
+        catch (SQLException | ClassNotFoundException ex)
         {
             Logger.getLogger(SqliteDataProvider.class.getName()).log(Level.SEVERE, null, ex);
         }

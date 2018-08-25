@@ -21,6 +21,8 @@ public class ResultSetObjectMapper
     public ResultSetObjectMapper()
     {
         rsGetters = new HashMap<>();
+        this.RegisterResultSetGetter(float.class, (rs, n) -> rs.getFloat(n));
+        this.RegisterResultSetGetter(Float.class, (rs, n) -> Float.valueOf(rs.getFloat(n)));
         this.RegisterResultSetGetter(double.class, (rs, n) -> rs.getDouble(n));
         this.RegisterResultSetGetter(Double.class, (rs, n) -> Double.valueOf(rs.getDouble(n)));
         this.RegisterResultSetGetter(int.class, (rs, n) -> rs.getInt(n));
