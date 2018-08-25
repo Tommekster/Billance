@@ -31,6 +31,7 @@ public class Contract
     @JsonRpcDataMember
     public Boolean archived;
     
+    @JsonRpcDataMember
     public Person[] persons;
     
 }

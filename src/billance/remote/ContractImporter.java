@@ -25,8 +25,9 @@ public class ContractImporter
                 System.out.println(c.eletricity);
                 System.out.println(c.archived);
                 // c.persons is null; jsonRpcMapper dont map complexObject
-                //Stream.of(c.persons).forEach(p->
-                  //  System.out.println(p.name+" "+p.surname));
+                System.out.print(c.persons);
+                Stream.of(c.persons).forEach(p->
+                    System.out.println(p.name+" "+p.surname));
             });
             
         }
