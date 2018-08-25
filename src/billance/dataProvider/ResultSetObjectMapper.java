@@ -3,8 +3,9 @@ package billance.dataProvider;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -15,6 +16,21 @@ import java.util.stream.Stream;
  */
 public class ResultSetObjectMapper
 {
+    Map<Class<?>, ResultSetGetter<?>> rsGetters;
+
+    public ResultSetObjectMapper()
+    {
+        rsGetters = new HashMap<>();
+        this.RegisterResultSetGetter(double.class, (rs, n) -> rs.getDouble(n));
+        this.RegisterResultSetGetter(Double.class, (rs, n) -> Double.valueOf(rs.getDouble(n)));
+        this.RegisterResultSetGetter(int.class, (rs, n) -> rs.getInt(n));
+        this.RegisterResultSetGetter(Integer.class, (rs, n) -> Integer.valueOf(rs.getInt(n)));
+        this.RegisterResultSetGetter(boolean.class, (rs, n) -> rs.getBoolean(n));
+        this.RegisterResultSetGetter(Boolean.class, (rs, n) -> Boolean.valueOf(rs.getBoolean(n)));
+        this.RegisterResultSetGetter(String.class, (rs, n) -> rs.getString(n));
+        this.RegisterResultSetGetter(Date.class, (rs, n) -> DateFormatProvider.getDate(rs, n));
+    }
+
     public <T> T map(ResultSet resultSet, Class<T> type)
     {
         try
@@ -31,22 +47,20 @@ public class ResultSetObjectMapper
         return null;
     }
 
+    private <T> void RegisterResultSetGetter(Class<T> forType, ResultSetGetter<T> getter)
+    {
+        rsGetters.put(forType, getter);
+    }
+
     private void setField(ResultSet resultSet, Field field, Object destination)
     {
         try
         {
             Class<?> fieldType = field.getType();
             String fieldName = this.getResultSetFieldName(field);
-            if (Date.class.equals(fieldType))
-            {
-                field.set(destination, DateFormatProvider.getDate(resultSet, fieldName));
-            }
-            else
-            {
-                field.set(destination, resultSet.getObject(fieldName, fieldType));
-            }
+            field.set(destination, this.getObject(resultSet, fieldName, fieldType));
         }
-        catch (IllegalArgumentException | IllegalAccessException | SQLException | ParseException ex)
+        catch (IllegalArgumentException | IllegalAccessException | SQLException ex)
         {
             Logger.getLogger(ResultSetObjectMapper.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -57,5 +71,16 @@ public class ResultSetObjectMapper
         ResultSetField rsField = field.getAnnotation(ResultSetField.class);
         String name = rsField.name();
         return !name.isEmpty() ? name : field.getName();
+    }
+
+    private <T> T getObject(ResultSet resultSet, String fieldName, Class<T> fieldType) throws SQLException
+    {
+        return (T) this.rsGetters.get(fieldType).apply(resultSet, fieldName);
+    }
+
+    @FunctionalInterface
+    private interface ResultSetGetter<R>
+    {
+        public R apply(ResultSet resultSet, String name) throws SQLException;
     }
 }
