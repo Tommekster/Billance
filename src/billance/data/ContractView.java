@@ -14,11 +14,11 @@ public class ContractView
     @ResultSetField
     public String code;
     
-    @JsonRpcDataMember
+    //@JsonRpcDataMember
     @ResultSetField
     public Date activeFrom;
     
-    @JsonRpcDataMember
+    //@JsonRpcDataMember
     @ResultSetField
     public Date activeTo;
     

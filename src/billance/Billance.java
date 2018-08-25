@@ -12,6 +12,7 @@ import billance.data.FlatView;
 import billance.dataProvider.DataProviderManager;
 import billance.dataProvider.IDataProvider;
 import billance.remote.ContractImporter;
+import billance.remote.ImporterWindow;
 import billance.tools.EnergyBillanceCalculator;
 import billance.tools.ToolsProvider;
 import java.awt.Color;
@@ -771,7 +772,12 @@ public class Billance extends javax.swing.JFrame
 
     private void importMenuItemActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_importMenuItemActionPerformed
     {//GEN-HEADEREND:event_importMenuItemActionPerformed
-        new ContractImporter().Import();
+        ContractView[] contracts = ImporterWindow.ShowImporter(this);
+        if (contracts.length > 0)
+        {
+            contractCmb.setModel(new DefaultComboBoxModel<>(contracts));
+            contractCmb.setSelectedIndex(-1);
+        }
     }//GEN-LAST:event_importMenuItemActionPerformed
 
     private void loadValuesFromContract(ContractView contract)

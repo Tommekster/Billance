@@ -5,13 +5,15 @@
  */
 package billance.remote;
 
+import billance.data.ContractView;
+import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
+import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.*;
 
 /**
  *
@@ -163,63 +165,23 @@ public class ImporterWindow extends javax.swing.JDialog
         setVisible(false);
         dispose();
     }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[])
-    {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try
-        {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+    
+    public static ContractView[] ShowImporter(java.awt.Frame parent){
+        ImporterWindow dialog = new ImporterWindow(new javax.swing.JFrame(), true);
+        dialog.setVisible(true);
+        if(dialog.getReturnStatus() == RET_OK){
+            try
             {
-                if ("Nimbus".equals(info.getName()))
-                {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+                return new ContractImporter().Import(dialog.urlTextField.getText());
+            }
+            catch (MalformedURLException ex)
+            {
+                Logger.getLogger(ImporterWindow.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(dialog, "URL address is in wrong format.", 
+                        "URL address Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-        catch (ClassNotFoundException ex)
-        {
-            java.util.logging.Logger.getLogger(ImporterWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (InstantiationException ex)
-        {
-            java.util.logging.Logger.getLogger(ImporterWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (IllegalAccessException ex)
-        {
-            java.util.logging.Logger.getLogger(ImporterWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (javax.swing.UnsupportedLookAndFeelException ex)
-        {
-            java.util.logging.Logger.getLogger(ImporterWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                ImporterWindow dialog = new ImporterWindow(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter()
-                {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e)
-                    {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
+        return new ContractView[0];
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -1,7 +1,9 @@
 package billance.remote;
 
+import billance.data.ContractView;
+
 
 public interface IBillanceRemoteService
 {
-    Contract[] getContracts();
+    ContractView[] loadContracts();
 }
