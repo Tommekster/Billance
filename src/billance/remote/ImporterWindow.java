@@ -6,8 +6,6 @@
 package billance.remote;
 
 import billance.data.ContractView;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.net.MalformedURLException;
